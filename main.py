@@ -7,7 +7,7 @@ from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, CommandHandler, filters
 from docx import Document
 
-# --- RENDER İÇİN SAHTE WEB SUNUCUSU (Hata vermesini engeller) ---
+# --- RENDER İÇİN SAHTE WEB SUNUCUSU ---
 class DummyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -23,19 +23,42 @@ def keep_alive():
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
 NETLIFY_URL = "https://gleaming-florentine-2a9135.netlify.app"
 
-# Bot /start yazıldığında özel klavye butonunu göndersin
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    button = KeyboardButton(
-        text="📄 Yeni Evrak Oluştur",
-        web_app=WebAppInfo(url=NETLIFY_URL)
-    )
-    keyboard = ReplyKeyboardMarkup([[button]], resize_keyboard=True)
+    # Klavye butonlarımızı emojilerle renklendirip, evrak tiplerini URL parametresi olarak ekliyoruz.
+    keyboard = [
+        [
+            KeyboardButton("👥 Veli Toplantısı", web_app=WebAppInfo(url=f"{NETLIFY_URL}?evrak=veli_toplanti")),
+            KeyboardButton("📝 Sene Başı Zümre", web_app=WebAppInfo(url=f"{NETLIFY_URL}?evrak=sene_basi_zumre"))
+        ],
+        [
+            KeyboardButton("🗳️ Başkanlık Seçimi", web_app=WebAppInfo(url=f"{NETLIFY_URL}?evrak=sinif_baskani")),
+            KeyboardButton("🪑 Oturma Planı", web_app=WebAppInfo(url=f"{NETLIFY_URL}?evrak=oturma_plani"))
+        ],
+        [
+            KeyboardButton("🎯 BEP Taslağı", web_app=WebAppInfo(url=f"{NETLIFY_URL}?evrak=bep")),
+            KeyboardButton("🧭 Rehberlik Sevk", web_app=WebAppInfo(url=f"{NETLIFY_URL}?evrak=ogrenci_sevk"))
+        ],
+        [
+            KeyboardButton("✂️ Ders Kesim Raporu", web_app=WebAppInfo(url=f"{NETLIFY_URL}?evrak=ders_kesim")),
+            KeyboardButton("🤝 Veli Görüşme", web_app=WebAppInfo(url=f"{NETLIFY_URL}?evrak=veli_gorusme"))
+        ],
+        [
+            KeyboardButton("✉️ Veli İzin Dilekçesi", web_app=WebAppInfo(url=f"{NETLIFY_URL}?evrak=veli_izin")),
+            KeyboardButton("📅 Yıllık Ders Planı", web_app=WebAppInfo(url=f"{NETLIFY_URL}?evrak=yillik_plan"))
+        ],
+        [
+            KeyboardButton("📖 Günlük Ders Planı", web_app=WebAppInfo(url=f"{NETLIFY_URL}?evrak=gunluk_plan")),
+            KeyboardButton("⚖️ ŞÖK Tutanağı", web_app=WebAppInfo(url=f"{NETLIFY_URL}?evrak=sok"))
+        ]
+    ]
+    
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    
     await update.message.reply_text(
-        "Merhaba Öğretmenim! Evrak hazırlamak için aşağıdaki butona tıklayın:",
-        reply_markup=keyboard
+        "Merhaba Öğretmenim! 👋\n\nAşağıdaki menüden hazırlamak istediğiniz evrağı seçiniz:",
+        reply_markup=reply_markup
     )
 
-# Formdan gelen verileri Word'e çeviren kısım
 async def web_app_data_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     raw_data = update.message.web_app_data.data
     data = json.loads(raw_data)
@@ -154,7 +177,6 @@ def main():
     
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     
-    # Yeni eklenen komut
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, web_app_data_handler))
     

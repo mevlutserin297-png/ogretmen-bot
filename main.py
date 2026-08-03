@@ -1,9 +1,24 @@
 import json
 import io
 import os
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
 from docx import Document
+
+# --- RENDER İÇİN SAHTE WEB SUNUCUSU (Hata vermesini engeller) ---
+class DummyHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot Aktif ve Calisiyor!")
+
+def keep_alive():
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(("0.0.0.0", port), DummyHandler)
+    server.serve_forever()
+# ----------------------------------------------------------------
 
 # Bot Token'ı Render üzerindeki Environment Variable alanından alacak
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
@@ -122,6 +137,10 @@ async def web_app_data_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     )
 
 def main():
+    # Sahte web sunucusunu arka planda başlat
+    threading.Thread(target=keep_alive, daemon=True).start()
+    
+    # Botu başlat
     app = ApplicationBuilder().token(BOT_TOKEN).build()
     app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, web_app_data_handler))
     print("Bot aktif, öğretmenlerin evrak talepleri bekleniyor...")

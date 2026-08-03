@@ -3,8 +3,8 @@ import io
 import os
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
+from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
+from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, CommandHandler, filters
 from docx import Document
 
 # --- RENDER İÇİN SAHTE WEB SUNUCUSU (Hata vermesini engeller) ---
@@ -20,9 +20,22 @@ def keep_alive():
     server.serve_forever()
 # ----------------------------------------------------------------
 
-# Bot Token'ı Render üzerindeki Environment Variable alanından alacak
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
+NETLIFY_URL = "https://gleaming-florentine-2a9135.netlify.app"
 
+# Bot /start yazıldığında özel klavye butonunu göndersin
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    button = KeyboardButton(
+        text="📄 Yeni Evrak Oluştur",
+        web_app=WebAppInfo(url=NETLIFY_URL)
+    )
+    keyboard = ReplyKeyboardMarkup([[button]], resize_keyboard=True)
+    await update.message.reply_text(
+        "Merhaba Öğretmenim! Evrak hazırlamak için aşağıdaki butona tıklayın:",
+        reply_markup=keyboard
+    )
+
+# Formdan gelen verileri Word'e çeviren kısım
 async def web_app_data_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     raw_data = update.message.web_app_data.data
     data = json.loads(raw_data)
@@ -137,12 +150,14 @@ async def web_app_data_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     )
 
 def main():
-    # Sahte web sunucusunu arka planda başlat
     threading.Thread(target=keep_alive, daemon=True).start()
     
-    # Botu başlat
     app = ApplicationBuilder().token(BOT_TOKEN).build()
+    
+    # Yeni eklenen komut
+    app.add_handler(CommandHandler("start", start_command))
     app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, web_app_data_handler))
+    
     print("Bot aktif, öğretmenlerin evrak talepleri bekleniyor...")
     app.run_polling()
 

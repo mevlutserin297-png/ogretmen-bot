@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // BOT TOKENİNİ BURAYA YAZ
-const BOT_TOKEN = "BURAYA_BOT_TOKEN_GELECEK";
+const BOT_TOKEN = "8958865902:AAF-3yEeTEhaObOBm0IqHc9q8kvc5gTpnRU";
 
 const database = JSON.parse(fs.readFileSync('./database.json', 'utf8'));
 const DB_BACKED_TYPES = ['sene_basi_zumre', 'sok_tutanagi', 'veli_toplantisi'];

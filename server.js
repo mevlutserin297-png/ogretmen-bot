@@ -5,56 +5,33 @@ const path = require('path');
 const PizZip = require('pizzip');
 const Docxtemplater = require('docxtemplater');
 
+// DİKKAT: BotFather'dan aldığın kendi Bot Token'ını BURAYA YAPIŞTIR!
+const BOT_TOKEN = "SENIN_BOT_TOKENINI_BURAYA_YAZ"; 
+
 const app = express();
 app.use(cors());
 app.use(express.json());
-// public klasöründeki index.html (Telegram Web App arayüzü) otomatik servis edilir
 app.use(express.static(path.join(__dirname, 'public')));
 
 const database = JSON.parse(fs.readFileSync('./database.json', 'utf8'));
 
-// Bu türler branşa göre veritabanından hazır gündem/karar metni çeker (öğretmen odaklı tutanaklar)
 const DB_BACKED_TYPES = ['sene_basi_zumre', 'sok_tutanagi', 'veli_toplantisi'];
-// Bu türler doğrudan formdan doldurulur, veritabanı gerektirmez (öğrenci odaklı / tekil evraklar)
 const FORM_ONLY_TYPES = [
   'veli_izin_dilekcesi', 'bep_taslagi', 'oturma_plani',
   'baskanlik_secimi', 'rehberlik_sevk', 'ders_kesim_raporu',
   'veli_gorusme', 'yillik_plan', 'gunluk_plan'
 ];
 
-app.post('/evrak-olustur', (req, res) => {
+app.post('/evrak-olustur', async (req, res) => {
   try {
     const {
-      brans,
-      evrak_turu,
-      egitim_yili,
-      okul_adi,
-      toplanti_tarihi,
-      toplanti_saati,
-      toplanti_yeri,
-      zumre_baskani,
-      okul_muduru,
-      ogretmenler,
-      ogrenciler,
-      sinif,
-      ogrenci_adi,
-      veli_adi,
-      izin_tarihi,
-      izin_nedeni,
-      tani,
-      hazirlayan_ogretmen,
-      tarih,
-      hedefler,
-      sinif_rehber_ogretmeni,
-      secilen_baskan,
-      sevk_nedeni,
-      sevk_eden_ogretmen,
-      ders_adi,
-      donem,
-      konu,
-      gorusme_konusu,
-      gorusme_tarihi,
-      maddeler
+      brans, evrak_turu, egitim_yili, okul_adi, toplanti_tarihi,
+      toplanti_saati, toplanti_yeri, zumre_baskani, okul_muduru,
+      ogretmenler, ogrenciler, sinif, ogrenci_adi, veli_adi, 
+      izin_tarihi, izin_nedeni, tani, hazirlayan_ogretmen, tarih, 
+      hedefler, sinif_rehber_ogretmeni, secilen_baskan, sevk_nedeni, 
+      sevk_eden_ogretmen, ders_adi, donem, konu, gorusme_konusu, 
+      gorusme_tarihi, maddeler, chat_id // YENİ: Telegram Kimliği Eklendi
     } = req.body;
 
     if (!evrak_turu) {
@@ -64,31 +41,20 @@ app.post('/evrak-olustur', (req, res) => {
     let hazirMetinler = { gundem_maddeleri: [], gorusmeler: [], alinan_kararlar: [] };
 
     if (DB_BACKED_TYPES.includes(evrak_turu)) {
-      if (!brans) {
-        return res.status(400).json({ message: 'Bu evrak türü için branş seçimi zorunludur.' });
-      }
-      if (!database[brans] || !database[brans][evrak_turu]) {
-        return res.status(404).json({ message: 'Bu branş veya evrak türü henüz sistemde tanımlı değil.' });
-      }
+      if (!brans) return res.status(400).json({ message: 'Bu evrak türü için branş seçimi zorunludur.' });
+      if (!database[brans] || !database[brans][evrak_turu]) return res.status(404).json({ message: 'Bu branş veya evrak türü henüz sistemde tanımlı değil.' });
       hazirMetinler = database[brans][evrak_turu];
     } else if (!FORM_ONLY_TYPES.includes(evrak_turu)) {
       return res.status(404).json({ message: 'Bilinmeyen evrak türü: ' + evrak_turu });
     }
 
     const templatePath = path.resolve(__dirname, 'templates', `${evrak_turu}_sablon.docx`);
-
-    if (!fs.existsSync(templatePath)) {
-      return res.status(404).json({ message: `Şablon dosyası bulunamadı: ${evrak_turu}_sablon.docx` });
-    }
+    if (!fs.existsSync(templatePath)) return res.status(404).json({ message: `Şablon dosyası bulunamadı: ${evrak_turu}_sablon.docx` });
 
     const content = fs.readFileSync(templatePath, 'binary');
     const zip = new PizZip(content);
-
     const doc = new Docxtemplater(zip, {
-      paragraphLoop: true,
-      linebreaks: true,
-      delimiters: { start: '{{', end: '}}' },
-      nullGetter: function () { return ''; } // eksik alan varsa hata vermek yerine boş bırak
+      paragraphLoop: true, linebreaks: true, delimiters: { start: '{{', end: '}}' }, nullGetter: () => ''
     });
 
     const renderData = {
@@ -126,32 +92,38 @@ app.post('/evrak-olustur', (req, res) => {
     };
 
     doc.render(renderData);
-
     const buf = doc.getZip().generate({ type: 'nodebuffer' });
-
     const fileName = brans ? `${evrak_turu}_${brans}.docx` : `${evrak_turu}.docx`;
+
+    // TELEGRAMA DOĞRUDAN GÖNDERME KISMI
+    if (chat_id && BOT_TOKEN !== "8958865902:AAF-3yEeTEhaObOBm0IqHc9q8kvc5gTpnRU") {
+      const formData = new FormData();
+      formData.append('chat_id', chat_id);
+      formData.append('document', new Blob([buf]), fileName);
+
+      const tgUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`;
+      const tgResponse = await fetch(tgUrl, { method: 'POST', body: formData });
+
+      if (tgResponse.ok) {
+        return res.json({ message: "Evrak başarıyla Telegram'a gönderildi!" });
+      } else {
+        console.error("Telegram Gönderim Hatası");
+        return res.status(500).json({ message: "Telegram'a gönderilemedi. Bot Token hatalı olabilir." });
+      }
+    } 
+    
+    // Eğer Telegram id bulunamazsa klasik indirme yapar (Yedek Sistem)
     res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
     res.send(buf);
 
   } catch (error) {
     console.error("Evrak oluşturulurken hata:", error);
-    if (error.properties && error.properties.errors instanceof Array) {
-      const errorMessages = error.properties.errors
-        .map((e) => e.properties && e.properties.explanation)
-        .join('\n');
-      console.error("Şablon Hataları:\n" + errorMessages);
-    }
     res.status(500).json({ message: "Evrak oluşturulamadı. Şablon veya veri hatası olabilir." });
   }
 });
 
-// Basit sağlık kontrolü
-app.get('/', (req, res) => {
-  res.send('Evrak motoru çalışıyor. Web App için /index.html adresine gidin.');
-});
+app.get('/', (req, res) => { res.send('Evrak motoru çalışıyor.'); });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Sunucu ${PORT} portunda çalışıyor... Evrak motoru hazır!`);
-});
+app.listen(PORT, () => { console.log(`Sunucu ${PORT} portunda çalışıyor...`); });

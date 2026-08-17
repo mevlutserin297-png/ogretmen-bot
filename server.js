@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// BOT TOKENİNİ BURAYA YAZ
+// BOT TOKENİNİ BURAYA YAZINIZ (Örn: "123456789:ABCdefGHI...")
 const BOT_TOKEN = "8958865902:AAF-3yEeTEhaObOBm0IqHc9q8kvc5gTpnRU";
 
 const database = JSON.parse(fs.readFileSync('./database.json', 'utf8'));
@@ -57,48 +57,51 @@ function sendToTelegram(token, chatId, buffer, filename) {
 app.post('/evrak-olustur', async (req, res) => {
   try {
     const data = req.body;
-    if (!data.evrak_turu) return res.status(400).json({ message: 'Evrak türü zorunludur.' });
+    if (!data.evrak_turu) return res.status(400).json({ message: 'Lütfen bir evrak türü seçiniz.' });
 
     let hazirMetinler = { gundem_maddeleri: [], gorusmeler: [], alinan_kararlar: [] };
 
+    // Veritabanı destekli evraklar için kontrol
     if (DB_BACKED_TYPES.includes(data.evrak_turu)) {
+      if (!data.brans) return res.status(400).json({ message: 'Bu evrak için branş seçimi zorunludur.' });
       if (!database[data.brans] || !database[data.brans][data.evrak_turu]) {
-        return res.status(404).json({ message: 'Sistemde bu evrak tanımlı değil.' });
+        return res.status(404).json({ message: 'Seçilen branş için bu evrak veritabanında henüz tanımlı değil.' });
       }
       hazirMetinler = database[data.brans][data.evrak_turu];
     }
 
     const templatePath = path.resolve(__dirname, 'templates', `${data.evrak_turu}_sablon.docx`);
-    if (!fs.existsSync(templatePath)) return res.status(404).json({ message: `Şablon bulunamadı: ${data.evrak_turu}` });
+    if (!fs.existsSync(templatePath)) return res.status(404).json({ message: `Şablon dosyası sunucuda bulunamadı: ${data.evrak_turu}` });
 
     const content = fs.readFileSync(templatePath, 'binary');
     const zip = new PizZip(content);
     const doc = new Docxtemplater(zip, {
       paragraphLoop: true, linebreaks: true,
       delimiters: { start: '{{', end: '}}' },
-      nullGetter: function () { return ''; }
+      nullGetter: function () { return ''; } // Boş kalan alanları "undefined" yerine boşluk yapar
     });
 
-    const ogretmenAdi = 'Mevlüt Hoca'; // Sabitlendi
-    const tarihDegeri = data.toplanti_tarihi || data.tarih || new Date().toLocaleDateString('tr-TR');
+    // Tüm girdileri dinamikleştirme (Kullanıcı ne girerse o çıkar)
+    const kullaniciAdi = data.sorumlu_kisi || '';
+    const tarihDegeri = data.toplanti_tarihi || new Date().toLocaleDateString('tr-TR');
 
-    // Dinamik listeyi evrak türüne göre doğru array'e yönlendirme
+    // Dinamik listeleri şablona uygun objelere dönüştürme
     let ogretmenler = [], ogrenciler = [], hedefler = [], maddeler = [];
-    if (data.evrak_modu === 'teacher' && data.dinamik_liste) {
-        ogretmenler = data.dinamik_liste.map((ad, i) => ({ sira: (i + 1).toString(), ogretmen_adi: ad }));
-    }
-    if (data.evrak_modu === 'student' && data.dinamik_liste) {
-        ogrenciler = data.dinamik_liste.map((ad, i) => ({ sira: (i + 1).toString(), ogrenci_adi: ad }));
-    }
-    if (data.evrak_turu === 'bep_taslagi' && data.dinamik_liste) {
-        hedefler = data.dinamik_liste.map((metin, i) => ({ hedef_no: (i + 1).toString(), hedef_metni: metin }));
-    }
-    if (['ders_kesim_raporu', 'yillik_plan', 'gunluk_plan'].includes(data.evrak_turu) && data.dinamik_liste) {
-        maddeler = data.dinamik_liste.map((metin, i) => ({ sira: (i + 1).toString(), madde_metni: metin }));
+    if (data.dinamik_liste && Array.isArray(data.dinamik_liste)) {
+        if (data.evrak_modu === 'teacher') {
+            ogretmenler = data.dinamik_liste.map((ad, i) => ({ sira: (i + 1).toString(), ogretmen_adi: ad }));
+        } else if (data.evrak_modu === 'student') {
+            ogrenciler = data.dinamik_liste.map((ad, i) => ({ sira: (i + 1).toString(), ogrenci_adi: ad }));
+        } else if (data.evrak_modu === 'bep') {
+            hedefler = data.dinamik_liste.map((metin, i) => ({ hedef_no: (i + 1).toString(), hedef_metni: metin }));
+        } else if (data.evrak_modu === 'rapor' || data.evrak_modu === 'plan') {
+            maddeler = data.dinamik_liste.map((metin, i) => ({ sira: (i + 1).toString(), madde_metni: metin }));
+        }
     }
 
+    // Şablona (Word) basılacak tüm değişkenlerin haritası
     const renderData = {
-      EGITIM_YILI: data.egitim_yili || '2026-2027',
+      EGITIM_YILI: data.egitim_yili || '',
       OKUL_ADI: data.okul_adi || '',
       OKUL_MUDURU: data.okul_muduru || '',
       SINIF: data.sinif || '',
@@ -107,10 +110,10 @@ app.post('/evrak-olustur', async (req, res) => {
       TOPLANTI_YERI: data.toplanti_yeri || 'Öğretmenler Odası',
       TARIH: tarihDegeri,
       
-      ZUMRE_BASKANI: ogretmenAdi,
-      HAZIRLAYAN_OGRETMEN: ogretmenAdi,
-      SEVK_EDEN_OGRETMEN: ogretmenAdi,
-      SINIF_REHBER_OGRETMENI: ogretmenAdi,
+      ZUMRE_BASKANI: kullaniciAdi,
+      HAZIRLAYAN_OGRETMEN: kullaniciAdi,
+      SEVK_EDEN_OGRETMEN: kullaniciAdi,
+      SINIF_REHBER_OGRETMENI: kullaniciAdi,
 
       OGRENCI_ADI: data.ogrenci_adi || '',
       VELI_ADI: data.veli_adi || '',
@@ -119,7 +122,7 @@ app.post('/evrak-olustur', async (req, res) => {
       GORUSME_KONUSU: data.aciklama_nedeni || '',
       TANI: data.tani || '',
       DONEM: data.donem || '',
-      DERS_ADI: data.ders_adi || 'Matematik',
+      DERS_ADI: data.ders_adi || (data.brans ? data.brans.toUpperCase() : ''),
       KONU: data.konu || '',
       IZIN_TARIHI: data.izin_tarihi || tarihDegeri,
 
@@ -138,17 +141,17 @@ app.post('/evrak-olustur', async (req, res) => {
     const fileName = data.brans ? `${data.evrak_turu}_${data.brans}.docx` : `${data.evrak_turu}.docx`;
 
     if (!data.telegram_user_id) {
-        return res.status(400).json({ message: "Telegram ID eksik." });
+        return res.status(400).json({ message: "Telegram kullanıcı kimliği doğrulanamadı. Lütfen bot üzerinden giriş yapın." });
     }
 
     await sendToTelegram(BOT_TOKEN, data.telegram_user_id, buf, fileName);
-    res.json({ message: "Evrak başarıyla Telegram'a gönderildi!" });
+    res.json({ message: "Evrak başarıyla oluşturuldu ve Telegram üzerinden tarafınıza iletildi." });
 
   } catch (error) {
-    console.error("Hata:", error);
-    res.status(500).json({ message: "İşlem sırasında hata oluştu." });
+    console.error("Evrak Üretim Hatası:", error);
+    res.status(500).json({ message: "Evrak işlenirken kritik bir sistem hatası oluştu. Lütfen alanları kontrol ediniz." });
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Sunucu ${PORT} portunda çalışıyor...`));
+app.listen(PORT, () => console.log(`Sunucu ${PORT} portunda başarıyla başlatıldı.`));

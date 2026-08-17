@@ -1,0 +1,15 @@
+{
+  "name": "evrak-bot-api",
+  "version": "1.0.0",
+  "description": "Matoyun.com ogretmen evrak otomasyonu (Telegram Web App + Word sablon motoru)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "docxtemplater": "^3.65.2",
+    "express": "^4.21.2",
+    "pizzip": "^3.2.0"
+  }
+}

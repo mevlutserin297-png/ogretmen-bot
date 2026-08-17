@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Öğretmen Asistanı</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, Arial, sans-serif; }
+  body { background: #f4f7f6; padding: 20px; }
+  .header { text-align: center; margin-bottom: 20px; }
+  .header h2 { font-size: 20px; font-weight: 700; color: #333; }
+  .header p { font-size: 13px; color: #7f8c8d; margin-top: 4px; }
+
+  .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .card { background: #ffffff; border-radius: 16px; padding: 20px 8px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer; border: 1px solid #eef2f5; }
+  .card:active { transform: scale(0.97); }
+  .card-icon { font-size: 28px; margin-bottom: 8px; }
+  .card-title { font-size: 13px; font-weight: 600; color: #34495e; }
+
+  #formView { display: none; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; color: #7f8c8d; margin-bottom: 6px; }
+  .form-group input, .form-group select {
+    width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #dcdcdc; font-size: 14px;
+  }
+  .form-group input:focus, .form-group select:focus { outline: 1px solid #3498db; }
+
+  .btn-back { background: none; border: none; color: #3498db; font-size: 13px; margin-bottom: 12px; cursor: pointer; }
+  .dynamic-item { display: flex; gap: 6px; margin-bottom: 8px; }
+  .btn-add { width: 100%; background: #e8f4fd; color: #2980b9; border: none; border-radius: 8px; padding: 10px; font-weight: 600; margin-top: 4px; }
+  .btn-remove { background: #ff7675; color: white; border: none; border-radius: 8px; width: 36px; }
+
+  .btn-submit { width: 100%; padding: 14px; background: #27ae60; color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 15px; margin-top: 10px; }
+  .btn-submit:disabled { background: #95a5a6; }
+  #statusMessage { text-align: center; margin-top: 12px; font-size: 13px; font-weight: 600; }
+
+  .group-tutanak, .group-oturma, .group-izin, .group-bep, .group-genel { display: none; }
+</style>
+</head>
+<body>
+
+<div id="menuView">
+  <div class="header">
+    <h2>📄 Öğretmen Asistanı</h2>
+    <p>Hangi evrağı hazırlayalım?</p>
+  </div>
+  <div class="grid-container">
+    <div class="card" onclick="openForm('sene_basi_zumre','Sene Başı Zümre')">
+      <div class="card-icon">📘</div>
+      <div class="card-title">Sene Başı Zümre</div>
+    </div>
+    <div class="card" onclick="openForm('sok_tutanagi','ŞÖK Tutanağı')">
+      <div class="card-icon">🏫</div>
+      <div class="card-title">ŞÖK Tutanağı</div>
+    </div>
+    <div class="card" onclick="openForm('veli_toplantisi','Veli Toplantısı')">
+      <div class="card-icon">👨‍👩‍👧</div>
+      <div class="card-title">Veli Toplantısı</div>
+    </div>
+    <div class="card" onclick="openForm('oturma_plani','Oturma Planı')">
+      <div class="card-icon">🪑</div>
+      <div class="card-title">Oturma Planı</div>
+    </div>
+    <div class="card" onclick="openForm('veli_izin_dilekcesi','Veli İzin Dilekçesi')">
+      <div class="card-icon">✍️</div>
+      <div class="card-title">Veli İzin Dilekçesi</div>
+    </div>
+    <div class="card" onclick="openForm('bep_taslagi','BEP Taslağı')">
+      <div class="card-icon">🎯</div>
+      <div class="card-title">BEP Taslağı</div>
+    </div>
+    <div class="card" onclick="openForm('baskanlik_secimi','Başkanlık Seçimi')">
+      <div class="card-icon">🗳️</div>
+      <div class="card-title">Başkanlık Seçimi</div>
+    </div>
+    <div class="card" onclick="openForm('rehberlik_sevk','Rehberlik Sevk')">
+      <div class="card-icon">🧭</div>
+      <div class="card-title">Rehberlik Sevk</div>
+    </div>
+    <div class="card" onclick="openForm('ders_kesim_raporu','Ders Kesim Raporu')">
+      <div class="card-icon">✂️</div>
+      <div class="card-title">Ders Kesim Raporu</div>
+    </div>
+    <div class="card" onclick="openForm('veli_gorusme','Veli Görüşme')">
+      <div class="card-icon">🤝</div>
+      <div class="card-title">Veli Görüşme</div>
+    </div>
+    <div class="card" onclick="openForm('yillik_plan','Yıllık Plan')">
+      <div class="card-icon">🗓️</div>
+      <div class="card-title">Yıllık Plan</div>
+    </div>
+    <div class="card" onclick="openForm('gunluk_plan','Günlük Plan')">
+      <div class="card-icon">📖</div>
+      <div class="card-title">Günlük Plan</div>
+    </div>
+  </div>
+</div>
+
+<div id="formView">
+  <button class="btn-back" onclick="goBack()">‹ Menüye Dön</button>
+  <h3 id="formTitle" style="font-size:16px; margin-bottom:16px;"></h3>
+
+  <form id="evrakForm">
+    <input type="hidden" id="evrakTuru" value="">
+
+    <!-- ORTAK ALANLAR (her evrakta olur) -->
+    <div class="form-group">
+      <label>Okul Adı</label>
+      <input type="text" id="okulAdi" placeholder="Örn: Atatürk Ortaokulu">
+    </div>
+    <div class="form-group">
+      <label>Tarih</label>
+      <input type="date" id="tarih">
+    </div>
+
+    <!-- GRUP: TUTANAK TÜRLERİ (Zümre / ŞÖK / Veli Toplantısı) -->
+    <div class="group-tutanak">
+      <div class="form-group">
+        <label>Branş / Ders</label>
+        <select id="brans">
+          <option value="matematik">Matematik</option>
+          <option value="fen_bilimleri">Fen Bilimleri</option>
+          <option value="turkce">Türkçe</option>
+          <option value="ingilizce">İngilizce</option>
+          <option value="sosyal_bilgiler">Sosyal Bilgiler</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Eğitim-Öğretim Yılı</label>
+        <input type="text" id="egitimYili" value="2026-2027">
+      </div>
+      <div class="form-group">
+        <label>Okul Müdürü</label>
+        <input type="text" id="okulMuduru" placeholder="Örn: Ahmet Yılmaz">
+      </div>
+      <div class="form-group">
+        <label>Zümre Başkanı / Toplantıyı Yöneten</label>
+        <input type="text" id="zumreBaskani" placeholder="Kendi adınız">
+      </div>
+      <div class="form-group" style="display:flex; gap:8px;">
+        <div style="flex:1;">
+          <label>Toplantı Saati</label>
+          <input type="time" id="toplantiSaati" value="15:30">
+        </div>
+        <div style="flex:1;">
+          <label>Toplantı Yeri</label>
+          <input type="text" id="toplantiYeri" placeholder="Öğretmenler Odası">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Katılan Öğretmenler</label>
+        <div id="ogretmenListesi"></div>
+        <button type="button" class="btn-add" onclick="addName('ogretmenListesi','öğretmen')">+ Öğretmen Ekle</button>
+      </div>
+    </div>
+
+    <!-- GRUP: OTURMA PLANI -->
+    <div class="group-oturma">
+      <div class="form-group">
+        <label>Sınıf</label>
+        <input type="text" id="sinifOturma" placeholder="Örn: 6/A">
+      </div>
+      <div class="form-group">
+        <label>Hazırlayan Öğretmen</label>
+        <input type="text" id="hazirlayanOturma" placeholder="Kendi adınız">
+      </div>
+      <div class="form-group">
+        <label>Okul Müdürü</label>
+        <input type="text" id="okulMuduruOturma" placeholder="Örn: Ahmet Yılmaz">
+      </div>
+      <div class="form-group">
+        <label>Sıradaki Öğrenciler</label>
+        <div id="ogrenciListesi"></div>
+        <button type="button" class="btn-add" onclick="addName('ogrenciListesi','öğrenci')">+ Öğrenci Ekle</button>
+      </div>
+    </div>
+
+    <!-- GRUP: VELİ İZİN DİLEKÇESİ -->
+    <div class="group-izin">
+      <div class="form-group">
+        <label>Sınıf</label>
+        <input type="text" id="sinifIzin" placeholder="Örn: 6/A">
+      </div>
+      <div class="form-group">
+        <label>Öğrenci Adı Soyadı</label>
+        <input type="text" id="ogrenciAdiIzin" placeholder="Örn: Zeynep Arslan">
+      </div>
+      <div class="form-group">
+        <label>Veli Adı Soyadı</label>
+        <input type="text" id="veliAdi" placeholder="Örn: Fatma Arslan">
+      </div>
+      <div class="form-group">
+        <label>İzin Tarihi</label>
+        <input type="date" id="izinTarihi">
+      </div>
+      <div class="form-group">
+        <label>İzin Nedeni</label>
+        <input type="text" id="izinNedeni" placeholder="Örn: Sağlık raporu">
+      </div>
+      <div class="form-group">
+        <label>Okul Müdürü</label>
+        <input type="text" id="okulMuduruIzin" placeholder="Örn: Ahmet Yılmaz">
+      </div>
+    </div>
+
+    <!-- GRUP: BEP TASLAĞI -->
+    <div class="group-bep">
+      <div class="form-group">
+        <label>Eğitim-Öğretim Yılı</label>
+        <input type="text" id="egitimYiliBep" value="2026-2027">
+      </div>
+      <div class="form-group">
+        <label>Öğrenci Adı Soyadı</label>
+        <input type="text" id="ogrenciAdiBep" placeholder="Örn: Ali Can">
+      </div>
+      <div class="form-group">
+        <label>Sınıf</label>
+        <input type="text" id="sinifBep" placeholder="Örn: 5/B">
+      </div>
+      <div class="form-group">
+        <label>Tanı / Değerlendirme</label>
+        <input type="text" id="tani" placeholder="Örn: Dikkat eksikliği">
+      </div>
+      <div class="form-group">
+        <label>Hazırlayan Öğretmen</label>
+        <input type="text" id="hazirlayanBep" placeholder="Kendi adınız">
+      </div>
+      <div class="form-group">
+        <label>Hedefler</label>
+        <div id="hedefListesi"></div>
+        <button type="button" class="btn-add" onclick="addName('hedefListesi','hedef')">+ Hedef Ekle</button>
+      </div>
+    </div>
+
+    <!-- GRUP: BAŞKANLIK SEÇİMİ / REHBERLİK SEVK / DERS KESİM / VELİ GÖRÜŞME / YILLIK PLAN / GÜNLÜK PLAN -->
+    <div class="group-genel">
+      <div class="form-group"><label>Sınıf</label><input type="text" id="genelSinif" placeholder="Örn: 6/A"></div>
+      <div class="form-group"><label>Ders / Branş</label><input type="text" id="genelDersAdi" placeholder="Örn: Matematik"></div>
+      <div class="form-group"><label>Dönem</label><input type="text" id="genelDonem" placeholder="Örn: 1. Dönem"></div>
+      <div class="form-group"><label>Konu</label><input type="text" id="genelKonu" placeholder="Örn: Kesirler"></div>
+      <div class="form-group"><label>Öğrenci Adı Soyadı</label><input type="text" id="genelOgrenciAdi" placeholder="Rehberlik / Görüşme için"></div>
+      <div class="form-group"><label>Veli Adı Soyadı</label><input type="text" id="genelVeliAdi" placeholder="Veli görüşmesi için"></div>
+      <div class="form-group"><label>Görüşme / Sevk Tarihi</label><input type="date" id="genelGorusmeTarihi"></div>
+      <div class="form-group"><label>Görüşme Konusu</label><input type="text" id="genelGorusmeKonusu" placeholder="Veli görüşmesi için"></div>
+      <div class="form-group"><label>Sevk Nedeni</label><input type="text" id="genelSevkNedeni" placeholder="Rehberlik sevk için"></div>
+      <div class="form-group"><label>Sınıf Rehber Öğretmeni</label><input type="text" id="genelSinifRehber" placeholder="Başkanlık seçimi için"></div>
+      <div class="form-group"><label>Seçilen Başkan</label><input type="text" id="genelSecilenBaskan" placeholder="Başkanlık seçimi için"></div>
+      <div class="form-group"><label>Hazırlayan / Sevk Eden Öğretmen</label><input type="text" id="genelHazirlayan" placeholder="Kendi adınız"></div>
+      <div class="form-group"><label>Okul Müdürü</label><input type="text" id="genelOkulMuduru" placeholder="Örn: Ahmet Yılmaz"></div>
+      <div class="form-group">
+        <label id="genelMaddelerLabel">Maddeler / Kalemler</label>
+        <div id="genelMaddeListesi"></div>
+        <button type="button" class="btn-add" onclick="addName('genelMaddeListesi','madde')">+ Madde Ekle</button>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit" id="submitBtn">Evrağı Üret ve İndir</button>
+    <div id="statusMessage"></div>
+  </form>
+</div>
+
+<script>
+  const tg = window.Telegram ? window.Telegram.WebApp : null;
+  if (tg) { tg.ready(); tg.expand(); }
+
+  const GROUP_BY_TYPE = {
+    sene_basi_zumre: 'group-tutanak',
+    sok_tutanagi: 'group-tutanak',
+    veli_toplantisi: 'group-tutanak',
+    oturma_plani: 'group-oturma',
+    veli_izin_dilekcesi: 'group-izin',
+    bep_taslagi: 'group-bep',
+    baskanlik_secimi: 'group-genel',
+    rehberlik_sevk: 'group-genel',
+    ders_kesim_raporu: 'group-genel',
+    veli_gorusme: 'group-genel',
+    yillik_plan: 'group-genel',
+    gunluk_plan: 'group-genel'
+  };
+
+  const MADDE_LABEL_BY_TYPE = {
+    baskanlik_secimi: 'Adaylar ve Öğrenci Listesi',
+    ders_kesim_raporu: 'İşlenen Konular',
+    veli_gorusme: 'Alınan Kararlar',
+    yillik_plan: 'Ünite / Konu Dağılımı',
+    gunluk_plan: 'Kazanımlar ve Etkinlikler'
+  };
+
+  function openForm(type, title) {
+    document.getElementById('evrakTuru').value = type;
+    document.getElementById('formTitle').innerText = title + " Bilgileri";
+    document.getElementById('menuView').style.display = 'none';
+    document.getElementById('formView').style.display = 'block';
+
+    // Sadece ilgili form grubunu göster, diğerlerini gizle
+    document.querySelectorAll('.group-tutanak, .group-oturma, .group-izin, .group-bep')
+      .forEach(el => el.style.display = 'none');
+    const activeGroup = GROUP_BY_TYPE[type];
+    if (activeGroup) {
+      document.querySelectorAll('.' + activeGroup).forEach(el => el.style.display = 'block');
+    }
+    document.getElementById('statusMessage').innerText = '';
+    const madLabel = MADDE_LABEL_BY_TYPE[type];
+    if (madLabel) document.getElementById('genelMaddelerLabel').innerText = madLabel;
+  }
+
+  function goBack() {
+    document.getElementById('formView').style.display = 'none';
+    document.getElementById('menuView').style.display = 'block';
+  }
+
+  function addName(containerId, placeholder) {
+    const container = document.getElementById(containerId);
+    const div = document.createElement('div');
+    div.className = 'dynamic-item';
+    div.innerHTML = `
+      <input type="text" class="name-input" placeholder="${placeholder || 'Ad Soyad'}">
+      <button type="button" class="btn-remove" onclick="this.parentElement.remove()">×</button>
+    `;
+    container.appendChild(div);
+  }
+
+  function namesFrom(containerId) {
+    return Array.from(document.querySelectorAll('#' + containerId + ' .name-input'))
+      .map(i => i.value.trim())
+      .filter(v => v !== '');
+  }
+
+  document.getElementById('evrakForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const status = document.getElementById('statusMessage');
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    status.style.color = '#2980b9';
+    status.innerText = 'Evrak hazırlanıyor, lütfen bekleyin...';
+
+    const evrakTuru = document.getElementById('evrakTuru').value;
+    const okulAdi = document.getElementById('okulAdi').value;
+    const tarih = document.getElementById('tarih').value;
+
+    let payload = { evrak_turu: evrakTuru, okul_adi: okulAdi, tarih: tarih };
+
+    if (evrakTuru === 'sene_basi_zumre' || evrakTuru === 'sok_tutanagi' || evrakTuru === 'veli_toplantisi') {
+      payload = Object.assign(payload, {
+        brans: document.getElementById('brans').value,
+        egitim_yili: document.getElementById('egitimYili').value,
+        okul_muduru: document.getElementById('okulMuduru').value,
+        zumre_baskani: document.getElementById('zumreBaskani').value,
+        toplanti_tarihi: tarih,
+        toplanti_saati: document.getElementById('toplantiSaati').value,
+        toplanti_yeri: document.getElementById('toplantiYeri').value,
+        ogretmenler: namesFrom('ogretmenListesi')
+      });
+    } else if (evrakTuru === 'oturma_plani') {
+      payload = Object.assign(payload, {
+        sinif: document.getElementById('sinifOturma').value,
+        zumre_baskani: document.getElementById('hazirlayanOturma').value,
+        okul_muduru: document.getElementById('okulMuduruOturma').value,
+        egitim_yili: '2026-2027',
+        ogrenciler: namesFrom('ogrenciListesi')
+      });
+    } else if (evrakTuru === 'veli_izin_dilekcesi') {
+      payload = Object.assign(payload, {
+        sinif: document.getElementById('sinifIzin').value,
+        ogrenci_adi: document.getElementById('ogrenciAdiIzin').value,
+        veli_adi: document.getElementById('veliAdi').value,
+        izin_tarihi: document.getElementById('izinTarihi').value,
+        izin_nedeni: document.getElementById('izinNedeni').value,
+        okul_muduru: document.getElementById('okulMuduruIzin').value
+      });
+    } else if (evrakTuru === 'bep_taslagi') {
+      payload = Object.assign(payload, {
+        egitim_yili: document.getElementById('egitimYiliBep').value,
+        ogrenci_adi: document.getElementById('ogrenciAdiBep').value,
+        sinif: document.getElementById('sinifBep').value,
+        tani: document.getElementById('tani').value,
+        hazirlayan_ogretmen: document.getElementById('hazirlayanBep').value,
+        hedefler: namesFrom('hedefListesi')
+      });
+    } else if (['baskanlik_secimi','rehberlik_sevk','ders_kesim_raporu','veli_gorusme','yillik_plan','gunluk_plan'].includes(evrakTuru)) {
+      payload = Object.assign(payload, {
+        sinif: document.getElementById('genelSinif').value,
+        ders_adi: document.getElementById('genelDersAdi').value,
+        donem: document.getElementById('genelDonem').value,
+        konu: document.getElementById('genelKonu').value,
+        ogrenci_adi: document.getElementById('genelOgrenciAdi').value,
+        veli_adi: document.getElementById('genelVeliAdi').value,
+        gorusme_tarihi: document.getElementById('genelGorusmeTarihi').value,
+        gorusme_konusu: document.getElementById('genelGorusmeKonusu').value,
+        sevk_nedeni: document.getElementById('genelSevkNedeni').value,
+        sinif_rehber_ogretmeni: document.getElementById('genelSinifRehber').value,
+        secilen_baskan: document.getElementById('genelSecilenBaskan').value,
+        hazirlayan_ogretmen: document.getElementById('genelHazirlayan').value,
+        sevk_eden_ogretmen: document.getElementById('genelHazirlayan').value,
+        okul_muduru: document.getElementById('genelOkulMuduru').value,
+        egitim_yili: '2026-2027',
+        maddeler: namesFrom('genelMaddeListesi')
+      });
+    }
+
+    try {
+      // Aynı sunucudan servis edildiği için göreceli adres kullanıyoruz.
+      // Böylece lokal test ve canlı (Render) ortamında adres değiştirmeye gerek kalmaz.
+      const response = await fetch('/evrak-olustur', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = payload.brans ? `${payload.evrak_turu}_${payload.brans}.docx` : `${payload.evrak_turu}.docx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        status.style.color = '#27ae60';
+        status.innerText = '✅ Evrak başarıyla üretildi ve indirildi!';
+      } else {
+        const errData = await response.json().catch(() => ({}));
+        status.style.color = '#c0392b';
+        status.innerText = '❌ Hata: ' + (errData.message || 'Sunucuya bağlanılamadı.');
+      }
+    } catch (err) {
+      status.style.color = '#c0392b';
+      status.innerText = '❌ Sunucuya bağlanılamadı. Bağlantınızı kontrol edin.';
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

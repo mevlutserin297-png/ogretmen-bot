@@ -1,0 +1,135 @@
+{
+  "matematik": {
+    "sene_basi_zumre": {
+      "gundem_maddeleri": [
+        { "madde_no": "1", "madde_metni": "Açılış ve yoklama." },
+        { "madde_no": "2", "madde_metni": "Bir önceki eğitim-öğretim yılının değerlendirilmesi." },
+        { "madde_no": "3", "madde_metni": "Türkiye Yüzyılı Maarif Modeli kapsamında yürütülecek yol haritasının belirlenmesi." },
+        { "madde_no": "4", "madde_metni": "Ders işlenişinde kullanılacak yöntem, teknik ve dijital materyallerin belirlenmesi." },
+        { "madde_no": "5", "madde_metni": "Öğrenci koçluğu ve motivasyon çalışmalarının planlanması." },
+        { "madde_no": "6", "madde_metni": "Ölçme ve değerlendirme yaklaşımlarının netleştirilmesi." },
+        { "madde_no": "7", "madde_metni": "Dilek ve temenniler." }
+      ],
+      "gorusmeler": [
+        { "madde_no": "1", "baslik": "Açılış ve Yoklama", "gorusme_metni": "Toplantı zümre başkanının açılış konuşmasıyla başladı, tüm branş öğretmenlerinin katılımıyla yoklama alındı." },
+        { "madde_no": "2", "baslik": "Geçmiş Yılın Değerlendirilmesi", "gorusme_metni": "Bir önceki eğitim-öğretim yılına ait akademik başarı verileri ve öğrenci gelişim raporları değerlendirildi." },
+        { "madde_no": "3", "baslik": "Yöntem ve Teknik Belirleme", "gorusme_metni": "Ders anlatımında akıl ve zeka oyunlarının, problem çözme tekniklerinin kullanılmasına karar verildi." }
+      ],
+      "alinan_kararlar": [
+        { "karar_no": "1", "karar_metni": "Ders içi etkinliklerde akıl yürütme ve problem çözme becerilerine ağırlık verilmesine karar verildi." },
+        { "karar_no": "2", "karar_metni": "Öğrenci başarısını artırmak amacıyla birebir öğrenci koçluğu uygulamasının başlatılmasına karar verildi." },
+        { "karar_no": "3", "karar_metni": "Dönem içinde en az bir deneme sınavı yapılmasına karar verildi." }
+      ]
+    },
+    "sok_tutanagi": {
+      "gundem_maddeleri": [
+        { "madde_no": "1", "madde_metni": "Açılış ve yoklama." },
+        { "madde_no": "2", "madde_metni": "Sınıfın genel akademik durumunun değerlendirilmesi." },
+        { "madde_no": "3", "madde_metni": "Devamsızlık ve disiplin durumunun görüşülmesi." },
+        { "madde_no": "4", "madde_metni": "Sınav kaygısı yaşayan öğrencilere yönelik alınacak tedbirler." },
+        { "madde_no": "5", "madde_metni": "Dilek ve temenniler." }
+      ],
+      "gorusmeler": [
+        { "madde_no": "1", "baslik": "Akademik Durum Değerlendirmesi", "gorusme_metni": "Sınıfın genel başarı durumu, dersler bazında ayrı ayrı ele alınarak risk grubundaki öğrenciler tespit edildi." },
+        { "madde_no": "2", "baslik": "Devamsızlık ve Disiplin", "gorusme_metni": "Devamsızlık sınırına yaklaşan öğrenciler için veli bilgilendirmesi yapılması gerektiği belirtildi." }
+      ],
+      "alinan_kararlar": [
+        { "karar_no": "1", "karar_metni": "Akademik desteğe ihtiyaç duyan öğrenciler için ek etüt programı oluşturulmasına karar verildi." },
+        { "karar_no": "2", "karar_metni": "Devamsızlığı artan öğrencilerin velileriyle görüşme yapılmasına karar verildi." }
+      ]
+    },
+    "veli_toplantisi": {
+      "gundem_maddeleri": [
+        { "madde_no": "1", "madde_metni": "Açılış ve yoklama." },
+        { "madde_no": "2", "madde_metni": "Sınıfın genel ders çalışma ortamının değerlendirilmesi." },
+        { "madde_no": "3", "madde_metni": "Evde verimli ders çalışma teknikleri." },
+        { "madde_no": "4", "madde_metni": "Veli - öğretmen iletişiminin güçlendirilmesi." },
+        { "madde_no": "5", "madde_metni": "Dilek ve temenniler." }
+      ],
+      "gorusmeler": [
+        { "madde_no": "1", "baslik": "Sınıfın Genel Durumu", "gorusme_metni": "Sınıfın akademik gelişimi ve sınıf içi davranış durumu velilerle paylaşıldı." }
+      ],
+      "alinan_kararlar": [
+        { "karar_no": "1", "karar_metni": "Velilerle iletişimin WhatsApp grubu üzerinden düzenli olarak sürdürülmesine karar verildi." },
+        { "karar_no": "2", "karar_metni": "Okul - veli işbirliğinin artırılması için aylık bilgilendirme yapılmasına karar verildi." }
+      ]
+    }
+  },
+  "fen_bilimleri": {
+    "sene_basi_zumre": {
+      "gundem_maddeleri": [
+        { "madde_no": "1", "madde_metni": "Açılış ve yoklama." },
+        { "madde_no": "2", "madde_metni": "Bir önceki eğitim-öğretim yılının değerlendirilmesi." },
+        { "madde_no": "3", "madde_metni": "Laboratuvar kullanım kurallarının belirlenmesi." },
+        { "madde_no": "4", "madde_metni": "Dilek ve temenniler." }
+      ],
+      "gorusmeler": [
+        { "madde_no": "1", "baslik": "Açılış ve Yoklama", "gorusme_metni": "Toplantı zümre başkanının açılış konuşmasıyla başladı, tüm branş öğretmenlerinin katılımıyla yoklama alındı." }
+      ],
+      "alinan_kararlar": [
+        { "karar_no": "1", "karar_metni": "Deneylerin laboratuvar ortamında güvenlik kurallarına uygun yapılmasına karar verildi." }
+      ]
+    },
+    "sok_tutanagi": {
+      "gundem_maddeleri": [ { "madde_no": "1", "madde_metni": "Açılış ve yoklama." }, { "madde_no": "2", "madde_metni": "Sınıfın genel akademik durumunun değerlendirilmesi." } ],
+      "gorusmeler": [ { "madde_no": "1", "baslik": "Akademik Durum Değerlendirmesi", "gorusme_metni": "Sınıfın genel başarı durumu değerlendirildi." } ],
+      "alinan_kararlar": [ { "karar_no": "1", "karar_metni": "Gerekli görülen öğrenciler için ek destek sağlanmasına karar verildi." } ]
+    },
+    "veli_toplantisi": {
+      "gundem_maddeleri": [ { "madde_no": "1", "madde_metni": "Açılış ve yoklama." }, { "madde_no": "2", "madde_metni": "Sınıfın genel durumunun değerlendirilmesi." } ],
+      "gorusmeler": [ { "madde_no": "1", "baslik": "Sınıfın Genel Durumu", "gorusme_metni": "Sınıfın akademik gelişimi velilerle paylaşıldı." } ],
+      "alinan_kararlar": [ { "karar_no": "1", "karar_metni": "Velilerle iletişimin düzenli sürdürülmesine karar verildi." } ]
+    }
+  },
+  "turkce": {
+    "sene_basi_zumre": {
+      "gundem_maddeleri": [ { "madde_no": "1", "madde_metni": "Açılış ve yoklama." }, { "madde_no": "2", "madde_metni": "Bir önceki eğitim-öğretim yılının değerlendirilmesi." } ],
+      "gorusmeler": [ { "madde_no": "1", "baslik": "Açılış ve Yoklama", "gorusme_metni": "Toplantı zümre başkanının açılış konuşmasıyla başladı." } ],
+      "alinan_kararlar": [ { "karar_no": "1", "karar_metni": "Okuma alışkanlığını artırmaya yönelik etkinlikler planlanmasına karar verildi." } ]
+    },
+    "sok_tutanagi": {
+      "gundem_maddeleri": [ { "madde_no": "1", "madde_metni": "Açılış ve yoklama." } ],
+      "gorusmeler": [ { "madde_no": "1", "baslik": "Akademik Durum Değerlendirmesi", "gorusme_metni": "Sınıfın genel başarı durumu değerlendirildi." } ],
+      "alinan_kararlar": [ { "karar_no": "1", "karar_metni": "Gerekli görülen öğrenciler için ek destek sağlanmasına karar verildi." } ]
+    },
+    "veli_toplantisi": {
+      "gundem_maddeleri": [ { "madde_no": "1", "madde_metni": "Açılış ve yoklama." } ],
+      "gorusmeler": [ { "madde_no": "1", "baslik": "Sınıfın Genel Durumu", "gorusme_metni": "Sınıfın akademik gelişimi velilerle paylaşıldı." } ],
+      "alinan_kararlar": [ { "karar_no": "1", "karar_metni": "Velilerle iletişimin düzenli sürdürülmesine karar verildi." } ]
+    }
+  },
+  "ingilizce": {
+    "sene_basi_zumre": {
+      "gundem_maddeleri": [ { "madde_no": "1", "madde_metni": "Açılış ve yoklama." }, { "madde_no": "2", "madde_metni": "Bir önceki eğitim-öğretim yılının değerlendirilmesi." } ],
+      "gorusmeler": [ { "madde_no": "1", "baslik": "Açılış ve Yoklama", "gorusme_metni": "Toplantı zümre başkanının açılış konuşmasıyla başladı." } ],
+      "alinan_kararlar": [ { "karar_no": "1", "karar_metni": "Konuşma pratiği ağırlıklı etkinlikler planlanmasına karar verildi." } ]
+    },
+    "sok_tutanagi": {
+      "gundem_maddeleri": [ { "madde_no": "1", "madde_metni": "Açılış ve yoklama." } ],
+      "gorusmeler": [ { "madde_no": "1", "baslik": "Akademik Durum Değerlendirmesi", "gorusme_metni": "Sınıfın genel başarı durumu değerlendirildi." } ],
+      "alinan_kararlar": [ { "karar_no": "1", "karar_metni": "Gerekli görülen öğrenciler için ek destek sağlanmasına karar verildi." } ]
+    },
+    "veli_toplantisi": {
+      "gundem_maddeleri": [ { "madde_no": "1", "madde_metni": "Açılış ve yoklama." } ],
+      "gorusmeler": [ { "madde_no": "1", "baslik": "Sınıfın Genel Durumu", "gorusme_metni": "Sınıfın akademik gelişimi velilerle paylaşıldı." } ],
+      "alinan_kararlar": [ { "karar_no": "1", "karar_metni": "Velilerle iletişimin düzenli sürdürülmesine karar verildi." } ]
+    }
+  },
+  "sosyal_bilgiler": {
+    "sene_basi_zumre": {
+      "gundem_maddeleri": [ { "madde_no": "1", "madde_metni": "Açılış ve yoklama." }, { "madde_no": "2", "madde_metni": "Bir önceki eğitim-öğretim yılının değerlendirilmesi." } ],
+      "gorusmeler": [ { "madde_no": "1", "baslik": "Açılış ve Yoklama", "gorusme_metni": "Toplantı zümre başkanının açılış konuşmasıyla başladı." } ],
+      "alinan_kararlar": [ { "karar_no": "1", "karar_metni": "Güncel olaylara yönelik tartışma etkinlikleri planlanmasına karar verildi." } ]
+    },
+    "sok_tutanagi": {
+      "gundem_maddeleri": [ { "madde_no": "1", "madde_metni": "Açılış ve yoklama." } ],
+      "gorusmeler": [ { "madde_no": "1", "baslik": "Akademik Durum Değerlendirmesi", "gorusme_metni": "Sınıfın genel başarı durumu değerlendirildi." } ],
+      "alinan_kararlar": [ { "karar_no": "1", "karar_metni": "Gerekli görülen öğrenciler için ek destek sağlanmasına karar verildi." } ]
+    },
+    "veli_toplantisi": {
+      "gundem_maddeleri": [ { "madde_no": "1", "madde_metni": "Açılış ve yoklama." } ],
+      "gorusmeler": [ { "madde_no": "1", "baslik": "Sınıfın Genel Durumu", "gorusme_metni": "Sınıfın akademik gelişimi velilerle paylaşıldı." } ],
+      "alinan_kararlar": [ { "karar_no": "1", "karar_metni": "Velilerle iletişimin düzenli sürdürülmesine karar verildi." } ]
+    }
+  }
+}

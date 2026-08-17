@@ -11,18 +11,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// AŞAĞIDAKİ SATIRA KENDİ BOT TOKENİNİ YAPIŞTIR
-const BOT_TOKEN = "8958865902:AAF-3yEeTEhaObOBm0IqHc9q8kvc5gTpnRU";
+// BOT TOKENİNİ BURAYA YAZ
+const BOT_TOKEN = "BURAYA_BOT_TOKEN_GELECEK";
 
 const database = JSON.parse(fs.readFileSync('./database.json', 'utf8'));
 const DB_BACKED_TYPES = ['sene_basi_zumre', 'sok_tutanagi', 'veli_toplantisi'];
-const FORM_ONLY_TYPES = [
-  'veli_izin_dilekcesi', 'bep_taslagi', 'oturma_plani',
-  'baskanlik_secimi', 'rehberlik_sevk', 'ders_kesim_raporu',
-  'veli_gorusme', 'yillik_plan', 'gunluk_plan'
-];
 
-// Telegram'a dosya gönderme fonksiyonu (Garantili yöntem)
 function sendToTelegram(token, chatId, buffer, filename) {
   return new Promise((resolve, reject) => {
     const boundary = '----TelegramBotBoundary' + Math.random().toString(16).slice(2);
@@ -68,7 +62,6 @@ app.post('/evrak-olustur', async (req, res) => {
     let hazirMetinler = { gundem_maddeleri: [], gorusmeler: [], alinan_kararlar: [] };
 
     if (DB_BACKED_TYPES.includes(data.evrak_turu)) {
-      if (!data.brans) return res.status(400).json({ message: 'Branş zorunludur.' });
       if (!database[data.brans] || !database[data.brans][data.evrak_turu]) {
         return res.status(404).json({ message: 'Sistemde bu evrak tanımlı değil.' });
       }
@@ -76,7 +69,7 @@ app.post('/evrak-olustur', async (req, res) => {
     }
 
     const templatePath = path.resolve(__dirname, 'templates', `${data.evrak_turu}_sablon.docx`);
-    if (!fs.existsSync(templatePath)) return res.status(404).json({ message: `Şablon bulunamadı.` });
+    if (!fs.existsSync(templatePath)) return res.status(404).json({ message: `Şablon bulunamadı: ${data.evrak_turu}` });
 
     const content = fs.readFileSync(templatePath, 'binary');
     const zip = new PizZip(content);
@@ -86,20 +79,58 @@ app.post('/evrak-olustur', async (req, res) => {
       nullGetter: function () { return ''; }
     });
 
+    const ogretmenAdi = 'Mevlüt Hoca'; // Sabitlendi
+    const tarihDegeri = data.toplanti_tarihi || data.tarih || new Date().toLocaleDateString('tr-TR');
+
+    // Dinamik listeyi evrak türüne göre doğru array'e yönlendirme
+    let ogretmenler = [], ogrenciler = [], hedefler = [], maddeler = [];
+    if (data.evrak_modu === 'teacher' && data.dinamik_liste) {
+        ogretmenler = data.dinamik_liste.map((ad, i) => ({ sira: (i + 1).toString(), ogretmen_adi: ad }));
+    }
+    if (data.evrak_modu === 'student' && data.dinamik_liste) {
+        ogrenciler = data.dinamik_liste.map((ad, i) => ({ sira: (i + 1).toString(), ogrenci_adi: ad }));
+    }
+    if (data.evrak_turu === 'bep_taslagi' && data.dinamik_liste) {
+        hedefler = data.dinamik_liste.map((metin, i) => ({ hedef_no: (i + 1).toString(), hedef_metni: metin }));
+    }
+    if (['ders_kesim_raporu', 'yillik_plan', 'gunluk_plan'].includes(data.evrak_turu) && data.dinamik_liste) {
+        maddeler = data.dinamik_liste.map((metin, i) => ({ sira: (i + 1).toString(), madde_metni: metin }));
+    }
+
     const renderData = {
       EGITIM_YILI: data.egitim_yili || '2026-2027',
       OKUL_ADI: data.okul_adi || '',
-      TOPLANTI_TARIHI: data.toplanti_tarihi || '',
-      TOPLANTI_SAATI: data.toplanti_saati || '',
-      TOPLANTI_YERI: data.toplanti_yeri || '',
-      ZUMRE_BASKANI: data.zumre_baskani || '',
       OKUL_MUDURU: data.okul_muduru || '',
       SINIF: data.sinif || '',
+      TOPLANTI_TARIHI: tarihDegeri,
+      TOPLANTI_SAATI: data.toplanti_saati || '',
+      TOPLANTI_YERI: data.toplanti_yeri || 'Öğretmenler Odası',
+      TARIH: tarihDegeri,
+      
+      ZUMRE_BASKANI: ogretmenAdi,
+      HAZIRLAYAN_OGRETMEN: ogretmenAdi,
+      SEVK_EDEN_OGRETMEN: ogretmenAdi,
+      SINIF_REHBER_OGRETMENI: ogretmenAdi,
+
+      OGRENCI_ADI: data.ogrenci_adi || '',
+      VELI_ADI: data.veli_adi || '',
+      SEVK_NEDENI: data.aciklama_nedeni || '',
+      IZIN_NEDENI: data.aciklama_nedeni || '',
+      GORUSME_KONUSU: data.aciklama_nedeni || '',
+      TANI: data.tani || '',
+      DONEM: data.donem || '',
+      DERS_ADI: data.ders_adi || 'Matematik',
+      KONU: data.konu || '',
+      IZIN_TARIHI: data.izin_tarihi || tarihDegeri,
+
       gundem_maddeleri: hazirMetinler.gundem_maddeleri || [],
       gorusmeler: hazirMetinler.gorusmeler || [],
       alinan_kararlar: hazirMetinler.alinan_kararlar || [],
-      ogretmenler: (data.ogretmenler || []).map((ad, i) => ({ sira: (i + 1).toString(), ogretmen_adi: ad })),
-      ogrenciler: (data.ogrenciler || []).map((ad, i) => ({ sira: (i + 1).toString(), ogrenci_adi: ad }))
+      
+      ogretmenler: ogretmenler,
+      ogrenciler: ogrenciler,
+      hedefler: hedefler,
+      maddeler: maddeler
     };
 
     doc.render(renderData);
@@ -107,11 +138,7 @@ app.post('/evrak-olustur', async (req, res) => {
     const fileName = data.brans ? `${data.evrak_turu}_${data.brans}.docx` : `${data.evrak_turu}.docx`;
 
     if (!data.telegram_user_id) {
-        return res.status(400).json({ message: "Telegram kullanıcı kimliğiniz alınamadı." });
-    }
-    
-    if (BOT_TOKEN === "BURAYA_KENDI_TOKENINI_YAPISTIR") {
-        return res.status(500).json({ message: "Bot Token girilmemiş! Lütfen server.js içini kontrol edin." });
+        return res.status(400).json({ message: "Telegram ID eksik." });
     }
 
     await sendToTelegram(BOT_TOKEN, data.telegram_user_id, buf, fileName);
@@ -119,7 +146,7 @@ app.post('/evrak-olustur', async (req, res) => {
 
   } catch (error) {
     console.error("Hata:", error);
-    res.status(500).json({ message: "İşlem sırasında bir hata oluştu." });
+    res.status(500).json({ message: "İşlem sırasında hata oluştu." });
   }
 });
 

@@ -18,10 +18,10 @@
         #formView { display: none; background: #ffffff; border-radius: 16px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
         .btn-back { background: #ff7675; color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; margin-bottom: 14px; }
         .form-title { font-size: 15px; font-weight: 700; text-align: center; margin-bottom: 14px; color: #2980b9; }
-        .form-group { margin-bottom: 12px; text-align: left; }
+        .form-group { margin-bottom: 12px; text-align: left; display: none; } /* Default hidden */
+        .form-group.active { display: block; }
         .form-group label { display: block; font-size: 11px; font-weight: 700; color: #7f8c8d; margin-bottom: 4px; text-transform: uppercase; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; outline: none; background: #f8fafc; }
-        .form-group input:focus, .form-group select:focus { border-color: #3498db; background: #fff; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; outline: none; background: #f8fafc; }
         .dynamic-item { display: flex; gap: 6px; margin-bottom: 6px; }
         .btn-add { background: #ebf5fb; color: #2980b9; border: 1px dashed #3498db; width: 100%; padding: 8px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; }
         .btn-remove { background: #ff7675; color: white; border: none; border-radius: 6px; width: 32px; cursor: pointer; font-weight: bold; }
@@ -35,18 +35,16 @@
     <div id="menuView">
         <div class="header">📄 Hangi Evrağı Hazırlayalım?</div>
         <div class="grid">
-            <div class="card" onclick="openDoc('veli_toplantisi', 'Veli Toplantısı', 'teacher')"><div class="card-icon">👥</div><div class="card-title">Veli Toplantısı</div></div>
             <div class="card" onclick="openDoc('sene_basi_zumre', 'Sene Başı Zümre', 'teacher')"><div class="card-icon">📝</div><div class="card-title">Sene Başı Zümre</div></div>
             <div class="card" onclick="openDoc('sok_tutanagi', 'ŞÖK Tutanağı', 'teacher')"><div class="card-icon">📋</div><div class="card-title">ŞÖK Tutanağı</div></div>
+            <div class="card" onclick="openDoc('veli_toplantisi', 'Veli Toplantısı', 'teacher')"><div class="card-icon">👥</div><div class="card-title">Veli Toplantısı</div></div>
+            <div class="card" onclick="openDoc('rehberlik_sevk', 'Rehberlik Sevk', 'sevk')"><div class="card-icon">🧭</div><div class="card-title">Rehberlik Sevk</div></div>
+            <div class="card" onclick="openDoc('bep_taslagi', 'BEP Taslağı', 'bep')"><div class="card-icon">🎯</div><div class="card-title">BEP Taslağı</div></div>
+            <div class="card" onclick="openDoc('veli_izin_dilekcesi', 'Veli İzin Dilekçesi', 'izin')"><div class="card-icon">✉️</div><div class="card-title">Veli İzin Dilekçesi</div></div>
+            <div class="card" onclick="openDoc('ders_kesim_raporu', 'Ders Kesim Raporu', 'rapor')"><div class="card-icon">✂️</div><div class="card-title">Ders Kesim Raporu</div></div>
+            <div class="card" onclick="openDoc('gunluk_plan', 'Günlük Plan', 'plan')"><div class="card-icon">🗓️</div><div class="card-title">Günlük/Yıllık Plan</div></div>
             <div class="card" onclick="openDoc('baskanlik_secimi', 'Başkanlık Seçimi', 'student')"><div class="card-icon">🗳️</div><div class="card-title">Başkanlık Seçimi</div></div>
             <div class="card" onclick="openDoc('oturma_plani', 'Oturma Planı', 'student')"><div class="card-icon">🪑</div><div class="card-title">Oturma Planı</div></div>
-            <div class="card" onclick="openDoc('bep_taslagi', 'BEP Taslağı', 'student')"><div class="card-icon">🎯</div><div class="card-title">BEP Taslağı</div></div>
-            <div class="card" onclick="openDoc('rehberlik_sevk', 'Rehberlik Sevk', 'single')"><div class="card-icon">🧭</div><div class="card-title">Rehberlik Sevk</div></div>
-            <div class="card" onclick="openDoc('ders_kesim_raporu', 'Ders Kesim Raporu', 'teacher')"><div class="card-icon">✂️</div><div class="card-title">Ders Kesim Raporu</div></div>
-            <div class="card" onclick="openDoc('veli_izin_dilekcesi', 'Veli İzin Dilekçesi', 'single')"><div class="card-icon">✉️</div><div class="card-title">Veli İzin Dilekçesi</div></div>
-            <div class="card" onclick="openDoc('yillik_plan', 'Yıllık Plan', 'teacher')"><div class="card-icon">📅</div><div class="card-title">Yıllık Plan</div></div>
-            <div class="card" onclick="openDoc('gunluk_plan', 'Günlük Plan', 'teacher')"><div class="card-icon">🗓️</div><div class="card-title">Günlük Plan</div></div>
-            <div class="card" onclick="openDoc('veli_gorusme', 'Veli Görüşme', 'single')"><div class="card-icon">🤝</div><div class="card-title">Veli Görüşme</div></div>
         </div>
     </div>
 
@@ -55,40 +53,49 @@
         <div class="form-title" id="formHeader">Evrak Detayları</div>
 
         <form id="docForm">
-            <input type="hidden" id="evrakTuru">
-            <input type="hidden" id="evrakModu">
+            <input type="hidden" id="evrakTuru"><input type="hidden" id="evrakModu">
 
-            <div class="form-group" id="groupBrans">
-                <label>Branş</label>
+            <!-- Ortak Alanlar -->
+            <div class="form-group active"><label>Okul Adı</label><input type="text" id="okulAdi" value="Atatürk Ortaokulu"></div>
+            <div class="form-group" id="grpMudur"><label>Okul Müdürü</label><input type="text" id="okulMuduru" value="Ahmet Yılmaz"></div>
+            <div class="form-group active"><label>Sınıf / Şube</label><input type="text" id="sinif" value="7/A"></div>
+            
+            <div class="form-group" id="grpBrans">
+                <label>Branş / Ders Adı</label>
                 <select id="brans">
                     <option value="matematik">Matematik</option>
                     <option value="fen_bilimleri">Fen Bilimleri</option>
                     <option value="turkce">Türkçe</option>
-                    <option value="ingilizce">İngilizce</option>
-                    <option value="sosyal_bilgiler">Sosyal Bilgiler</option>
                 </select>
             </div>
 
-            <div class="form-group"><label>Okul Adı</label><input type="text" id="okulAdi" value="Atatürk Ortaokulu" required></div>
-            <div class="form-group"><label>Okul Müdürü</label><input type="text" id="okulMuduru" value="Ahmet Yılmaz" required></div>
-            <div class="form-group"><label>Sınıf / Şube</label><input type="text" id="sinif" value="7/A"></div>
-
-            <div class="form-group" id="groupTarih">
+            <div class="form-group active" id="grpTarih">
                 <label>Tarih ve Saat</label>
                 <div style="display:flex; gap:6px;">
                     <input type="date" id="toplantiTarihi" required>
-                    <input type="time" id="toplantiSaati" value="15:30">
+                    <input type="time" id="toplantiSaati" value="15:30" id="saatInput">
                 </div>
             </div>
 
-            <!-- Adın tam olarak ayarlandı, soyadın çıkarıldı -->
-            <div class="form-group">
-                <label id="lblSorumlu">ZÜMRE / TOPLANTI BAŞKANI</label>
-                <input type="text" id="sorumluKisi" value="Mevlüt Hoca" required>
+            <!-- Tekil Öğrenci / Veli / Sevk Alanları -->
+            <div class="form-group" id="grpOgrenci"><label>Öğrenci Adı Soyadı</label><input type="text" id="ogrenciAdi"></div>
+            <div class="form-group" id="grpVeli"><label>Veli Adı Soyadı</label><input type="text" id="veliAdi"></div>
+            <div class="form-group" id="grpNeden"><label id="lblNeden">Açıklama / Sevk Nedeni</label><textarea id="aciklamaNedeni" rows="2"></textarea></div>
+            <div class="form-group" id="grpTani"><label>Öğrenci Tanısı</label><input type="text" id="tani" placeholder="Örn: Özgül Öğrenme Güçlüğü"></div>
+            
+            <!-- Plan / Rapor Alanları -->
+            <div class="form-group" id="grpDonem"><label>Dönem</label><input type="text" id="donem" placeholder="Örn: 2026-2027 Eğitim Yılı 1. Dönem"></div>
+            <div class="form-group" id="grpKonu"><label>Konu</label><input type="text" id="konu" placeholder="Örn: Cebirsel İfadeler"></div>
+
+            <div class="form-group active">
+                <label id="lblSorumlu">Öğretmen Adı Soyadı</label>
+                <!-- İsmin Sabitlendi -->
+                <input type="text" value="Mevlüt Hoca" readonly style="background:#e2e8f0; font-weight:bold; color:#2c3e50;">
             </div>
 
-            <div class="form-group" id="groupDinamik">
-                <label id="lblDinamik">Katılımcı Listesi</label>
+            <!-- Dinamik Ekleme Alanı -->
+            <div class="form-group" id="grpDinamik">
+                <label id="lblDinamik">Liste Ekle</label>
                 <div id="dynamicList"></div>
                 <button type="button" class="btn-add" id="btnAdd" onclick="addDynamicItem()">+ Ekle</button>
             </div>
@@ -103,29 +110,42 @@
     const tg = window.Telegram?.WebApp;
     if (tg) { tg.ready(); tg.expand(); }
 
+    function showGroups(ids) {
+        document.querySelectorAll('.form-group').forEach(el => el.classList.remove('active'));
+        ids.forEach(id => document.getElementById(id).classList.add('active'));
+    }
+
     function openDoc(type, title, mode) {
         document.getElementById('evrakTuru').value = type;
         document.getElementById('evrakModu').value = mode;
         document.getElementById('formHeader').innerText = title;
         document.getElementById('dynamicList').innerHTML = "";
         
-        const groupBrans = document.getElementById('groupBrans');
-        const groupDinamik = document.getElementById('groupDinamik');
-        const lblSorumlu = document.getElementById('lblSorumlu');
+        let activeFields = ['grpTarih']; // Herkeste tarih olsun
         const lblDinamik = document.getElementById('lblDinamik');
         const btnAdd = document.getElementById('btnAdd');
 
         if (mode === 'teacher') {
-            groupBrans.style.display = 'block'; groupDinamik.style.display = 'block';
-            lblSorumlu.innerText = "Zümre / Toplantı Başkanı"; lblDinamik.innerText = "Katılan Diğer Öğretmenler"; btnAdd.innerText = "+ Öğretmen Ekle";
+            activeFields.push('grpBrans', 'grpMudur', 'grpDinamik');
+            lblDinamik.innerText = "Katılan Diğer Öğretmenler"; btnAdd.innerText = "+ Öğretmen Ekle";
         } else if (mode === 'student') {
-            groupBrans.style.display = 'none'; groupDinamik.style.display = 'block';
-            lblSorumlu.innerText = "Sınıf Rehber Öğretmeni"; lblDinamik.innerText = "Öğrenci Listesi / Adaylar"; btnAdd.innerText = "+ Öğrenci Ekle";
-        } else {
-            groupBrans.style.display = 'none'; groupDinamik.style.display = 'none';
-            lblSorumlu.innerText = "Düzenleyen Öğretmen";
+            activeFields.push('grpMudur', 'grpDinamik');
+            lblDinamik.innerText = "Öğrenci Listesi"; btnAdd.innerText = "+ Öğrenci Ekle";
+        } else if (mode === 'sevk') {
+            activeFields.push('grpOgrenci', 'grpNeden');
+            document.getElementById('lblNeden').innerText = "Sevk / Görüşme Nedeni";
+        } else if (mode === 'izin') {
+            activeFields.push('grpOgrenci', 'grpVeli', 'grpNeden', 'grpMudur');
+            document.getElementById('lblNeden').innerText = "İzin Nedeni";
+        } else if (mode === 'bep') {
+            activeFields.push('grpOgrenci', 'grpTani', 'grpDinamik');
+            lblDinamik.innerText = "BEP Hedefleri"; btnAdd.innerText = "+ Hedef Ekle";
+        } else if (mode === 'rapor' || mode === 'plan') {
+            activeFields.push('grpBrans', 'grpDonem', 'grpKonu', 'grpDinamik', 'grpMudur');
+            lblDinamik.innerText = "İşlenen Konular / Kazanımlar"; btnAdd.innerText = "+ Madde Ekle";
         }
-
+        
+        showGroups(activeFields);
         document.getElementById('menuView').style.display = 'none';
         document.getElementById('formView').style.display = 'block';
         document.getElementById('statusMessage').innerText = "";
@@ -137,10 +157,9 @@
     }
 
     function addDynamicItem() {
-        const mode = document.getElementById('evrakModu').value;
         const div = document.createElement('div');
         div.className = 'dynamic-item';
-        div.innerHTML = `<input type="text" class="dyn-val" placeholder="${mode === 'student' ? 'Öğrenci Adı' : 'Öğretmen Adı'}"><button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>`;
+        div.innerHTML = `<input type="text" class="dyn-val" placeholder="Buraya yazın..."><button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>`;
         document.getElementById('dynamicList').appendChild(div);
     }
 
@@ -151,25 +170,29 @@
         
         btn.disabled = true;
         status.style.color = "#2980b9";
-        status.innerText = "Evrak hazırlanıp Telegram'a gönderiliyor...";
+        status.innerText = "Evrak en ince detayına kadar hazırlanıyor...";
 
-        const mode = document.getElementById('evrakModu').value;
         const inputs = document.querySelectorAll('.dyn-val');
         const list = [];
         inputs.forEach(input => { if (input.value.trim() !== "") list.push(input.value.trim()); });
 
         const payload = {
             telegram_user_id: tg?.initDataUnsafe?.user?.id, 
-            brans: document.getElementById('brans').value,
             evrak_turu: document.getElementById('evrakTuru').value,
-            okul_adi: document.getElementById('okulAdi').value,
-            okul_muduru: document.getElementById('okulMuduru').value,
-            sinif: document.getElementById('sinif').value,
-            toplanti_tarihi: document.getElementById('toplantiTarihi').value,
-            toplanti_saati: document.getElementById('toplantiSaati').value,
-            zumre_baskani: document.getElementById('sorumluKisi').value,
-            ogretmenler: mode === 'teacher' ? list : [],
-            ogrenciler: mode === 'student' ? list : []
+            evrak_modu: document.getElementById('evrakModu').value,
+            brans: document.getElementById('brans')?.value,
+            okul_adi: document.getElementById('okulAdi')?.value,
+            okul_muduru: document.getElementById('okulMuduru')?.value,
+            sinif: document.getElementById('sinif')?.value,
+            ogrenci_adi: document.getElementById('ogrenciAdi')?.value,
+            veli_adi: document.getElementById('veliAdi')?.value,
+            aciklama_nedeni: document.getElementById('aciklamaNedeni')?.value,
+            tani: document.getElementById('tani')?.value,
+            donem: document.getElementById('donem')?.value,
+            konu: document.getElementById('konu')?.value,
+            toplanti_tarihi: document.getElementById('toplantiTarihi')?.value,
+            toplanti_saati: document.getElementById('toplantiSaati')?.value,
+            dinamik_liste: list
         };
 
         try {
@@ -179,12 +202,12 @@
                 body: JSON.stringify(payload)
             });
 
-            const resData = await response.json();
             if (response.ok) {
                 status.style.color = "#27ae60";
-                status.innerText = "✅ Evrak başarıyla sohbete gönderildi!";
+                status.innerText = "✅ Kusursuz! Evrak mesaj olarak gönderildi.";
                 setTimeout(() => { if (tg) tg.close(); }, 2500); 
             } else {
+                const resData = await response.json();
                 status.style.color = "#e74c3c";
                 status.innerText = resData.message || "Hata oluştu.";
             }

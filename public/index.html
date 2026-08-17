@@ -31,10 +31,18 @@
 <div class="container">
     <div id="menuView">
         <div class="header">📄 Hangi Evrağı Hazırlayalım?</div>
+        <!-- TÜM BUTONLAR GERİ GELDİ :) -->
         <div class="grid">
             <div class="card" onclick="openDoc('veli_toplantisi', 'Veli Toplantısı', 'teacher')"><div class="card-icon">👥</div><div class="card-title">Veli Toplantısı</div></div>
             <div class="card" onclick="openDoc('sene_basi_zumre', 'Sene Başı Zümre', 'teacher')"><div class="card-icon">📝</div><div class="card-title">Sene Başı Zümre</div></div>
             <div class="card" onclick="openDoc('sok_tutanagi', 'ŞÖK Tutanağı', 'teacher')"><div class="card-icon">📋</div><div class="card-title">ŞÖK Tutanağı</div></div>
+            <div class="card" onclick="openDoc('baskanlik_secimi', 'Başkanlık Seçimi', 'student')"><div class="card-icon">🗳️</div><div class="card-title">Başkanlık Seçimi</div></div>
+            <div class="card" onclick="openDoc('oturma_plani', 'Oturma Planı', 'student')"><div class="card-icon">🪑</div><div class="card-title">Oturma Planı</div></div>
+            <div class="card" onclick="openDoc('bep_taslagi', 'BEP Taslağı', 'student')"><div class="card-icon">🎯</div><div class="card-title">BEP Taslağı</div></div>
+            <div class="card" onclick="openDoc('rehberlik_sevk', 'Rehberlik Sevk', 'single')"><div class="card-icon">🧭</div><div class="card-title">Rehberlik Sevk</div></div>
+            <div class="card" onclick="openDoc('ders_kesim_raporu', 'Ders Kesim Raporu', 'teacher')"><div class="card-icon">✂️</div><div class="card-title">Ders Kesim Raporu</div></div>
+            <div class="card" onclick="openDoc('veli_izin_dilekcesi', 'Veli İzin Dilekçesi', 'single')"><div class="card-icon">✉️</div><div class="card-title">Veli İzin Dilekçesi</div></div>
+            <div class="card" onclick="openDoc('yillik_plan', 'Yıllık Plan', 'teacher')"><div class="card-icon">📅</div><div class="card-title">Yıllık Plan</div></div>
         </div>
     </div>
 
@@ -61,11 +69,11 @@
                 <label>Tarih ve Saat</label>
                 <div style="display:flex; gap:6px;"><input type="date" id="toplantiTarihi" required><input type="time" id="toplantiSaati" value="15:30"></div>
             </div>
-            <div class="form-group"><label id="lblSorumlu">Öğretmen Adı Soyadı</label><input type="text" id="sorumluKisi" required></div>
+            <div class="form-group"><label id="lblSorumlu">Öğretmen Adı Soyadı</label><input type="text" id="sorumluKisi" placeholder="Mevlüt Serin" required></div>
             <div class="form-group" id="groupDinamik">
                 <label id="lblDinamik">Katılımcı Listesi</label>
                 <div id="dynamicList"></div>
-                <button type="button" class="btn-add" onclick="addDynamicItem()">+ Ekle</button>
+                <button type="button" class="btn-add" onclick="addDynamicItem()" id="btnAdd">+ Ekle</button>
             </div>
             <button type="submit" class="btn-submit" id="btnSubmit">Evrağı Üret ve Bana Gönder</button>
         </form>
@@ -82,6 +90,31 @@
         document.getElementById('evrakModu').value = mode;
         document.getElementById('formHeader').innerText = title;
         document.getElementById('dynamicList').innerHTML = "";
+        
+        const groupBrans = document.getElementById('groupBrans');
+        const groupDinamik = document.getElementById('groupDinamik');
+        const lblSorumlu = document.getElementById('lblSorumlu');
+        const lblDinamik = document.getElementById('lblDinamik');
+        const btnAdd = document.getElementById('btnAdd');
+
+        if (mode === 'teacher') {
+            groupBrans.style.display = 'block';
+            groupDinamik.style.display = 'block';
+            lblSorumlu.innerText = "Zümre / Toplantı Başkanı";
+            lblDinamik.innerText = "Katılan Diğer Öğretmenler";
+            btnAdd.innerText = "+ Öğretmen Ekle";
+        } else if (mode === 'student') {
+            groupBrans.style.display = 'none';
+            groupDinamik.style.display = 'block';
+            lblSorumlu.innerText = "Sınıf Rehber Öğretmeni";
+            lblDinamik.innerText = "Öğrenci Listesi / Adaylar";
+            btnAdd.innerText = "+ Öğrenci Ekle";
+        } else {
+            groupBrans.style.display = 'none';
+            groupDinamik.style.display = 'none';
+            lblSorumlu.innerText = "Düzenleyen Öğretmen";
+        }
+
         document.getElementById('menuView').style.display = 'none';
         document.getElementById('formView').style.display = 'block';
         document.getElementById('statusMessage').innerText = "";
@@ -93,9 +126,10 @@
     }
 
     function addDynamicItem() {
+        const mode = document.getElementById('evrakModu').value;
         const div = document.createElement('div');
         div.className = 'dynamic-item';
-        div.innerHTML = `<input type="text" class="dyn-val" placeholder="Kişi Adı Soyadı"><button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>`;
+        div.innerHTML = `<input type="text" class="dyn-val" placeholder="${mode === 'student' ? 'Öğrenci Adı Soyadı' : 'Öğretmen Adı Soyadı'}"><button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>`;
         document.getElementById('dynamicList').appendChild(div);
     }
 
@@ -113,7 +147,7 @@
         inputs.forEach(input => { if (input.value.trim() !== "") list.push(input.value.trim()); });
 
         const payload = {
-            // Telegram kullanıcısının ID'sini alıyoruz!
+            // Telegram kullanıcısının ID'sini çekiyoruz
             telegram_user_id: tg?.initDataUnsafe?.user?.id || null, 
             brans: document.getElementById('brans').value,
             evrak_turu: document.getElementById('evrakTuru').value,
@@ -123,7 +157,8 @@
             toplanti_tarihi: document.getElementById('toplantiTarihi').value,
             toplanti_saati: document.getElementById('toplantiSaati').value,
             zumre_baskani: document.getElementById('sorumluKisi').value,
-            ogretmenler: list
+            ogretmenler: document.getElementById('evrakModu').value === 'teacher' ? list : [],
+            ogrenciler: document.getElementById('evrakModu').value === 'student' ? list : []
         };
 
         try {
@@ -137,7 +172,7 @@
             if (response.ok) {
                 status.style.color = "#27ae60";
                 status.innerText = "Evrak bot üzerinden mesaj olarak gönderildi! 🚀";
-                setTimeout(() => { if (tg) tg.close(); }, 2500); // 2.5 saniye sonra pencereyi kapat
+                setTimeout(() => { if (tg) tg.close(); }, 2500);
             } else {
                 status.style.color = "#e74c3c";
                 status.innerText = resData.message || "Hata oluştu.";

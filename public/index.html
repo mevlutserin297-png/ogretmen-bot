@@ -3,37 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Öğretmen Asistanı</title>
+    <title>Öğretmen Asistanı Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: #eef2f5; padding: 14px; color: #2c3e50; }
-        .container { max-width: 480px; margin: 0 auto; }
-        .header { text-align: center; margin-bottom: 16px; font-weight: 700; font-size: 17px; }
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .card { background: #ffffff; border-radius: 14px; padding: 16px 10px; text-align: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; transition: transform 0.1s; }
-        .card:active { transform: scale(0.97); }
-        .card-icon { font-size: 26px; margin-bottom: 6px; }
-        .card-title { font-size: 13px; font-weight: 600; }
-        #formView { display: none; background: #ffffff; border-radius: 16px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-        .btn-back { background: #ff7675; color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; margin-bottom: 14px; }
-        .form-title { font-size: 15px; font-weight: 700; text-align: center; margin-bottom: 14px; color: #2980b9; }
-        .form-group { margin-bottom: 12px; text-align: left; display: none; } /* Default hidden */
-        .form-group.active { display: block; }
-        .form-group label { display: block; font-size: 11px; font-weight: 700; color: #7f8c8d; margin-bottom: 4px; text-transform: uppercase; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; outline: none; background: #f8fafc; }
-        .dynamic-item { display: flex; gap: 6px; margin-bottom: 6px; }
-        .btn-add { background: #ebf5fb; color: #2980b9; border: 1px dashed #3498db; width: 100%; padding: 8px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; }
-        .btn-remove { background: #ff7675; color: white; border: none; border-radius: 6px; width: 32px; cursor: pointer; font-weight: bold; }
-        .btn-submit { width: 100%; padding: 12px; background: #2ecc71; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 2px 6px rgba(46,204,113,0.3); }
-        #statusMessage { margin-top: 10px; font-size: 12px; text-align: center; font-weight: 600; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f3f4f6; padding: 16px; color: #1f2937; }
+        .container { max-width: 500px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 20px; font-weight: 800; font-size: 18px; color: #111827; }
+        
+        /* Grid ve Kartlar */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .card { background: #ffffff; border-radius: 16px; padding: 18px 12px; text-align: center; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e5e7eb; transition: all 0.2s ease; }
+        .card:active { transform: scale(0.96); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .card-icon { font-size: 28px; margin-bottom: 8px; }
+        .card-title { font-size: 13px; font-weight: 600; color: #374151; }
+        
+        /* Form Görünümü */
+        #formView { display: none; background: #ffffff; border-radius: 20px; padding: 24px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .btn-back { background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 6px; }
+        .form-title { font-size: 16px; font-weight: 800; text-align: center; margin-bottom: 20px; color: #2563eb; padding-bottom: 10px; border-bottom: 2px solid #eff6ff; }
+        
+        /* Input Grupları */
+        .form-group { margin-bottom: 16px; text-align: left; display: none; } 
+        .form-group.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .form-group label { display: block; font-size: 12px; font-weight: 700; color: #4b5563; margin-bottom: 6px; letter-spacing: 0.3px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #d1d5db; font-size: 14px; outline: none; background: #f9fafb; transition: all 0.2s; color: #111827; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #3b82f6; background: #ffffff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        
+        /* Dinamik Liste */
+        .dynamic-item { display: flex; gap: 8px; margin-bottom: 8px; }
+        .btn-add { background: #eff6ff; color: #2563eb; border: 1px dashed #93c5fd; width: 100%; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 700; transition: 0.2s; }
+        .btn-add:hover { background: #dbeafe; }
+        .btn-remove { background: #fee2e2; color: #ef4444; border: none; border-radius: 8px; width: 40px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.2s; }
+        
+        /* Submit Butonu */
+        .btn-submit { width: 100%; padding: 14px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; margin-top: 16px; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); transition: transform 0.1s; }
+        .btn-submit:active { transform: scale(0.98); }
+        .btn-submit:disabled { background: #9ca3af; cursor: not-allowed; box-shadow: none; }
+        #statusMessage { margin-top: 14px; font-size: 13px; text-align: center; font-weight: 700; padding: 10px; border-radius: 8px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="menuView">
-        <div class="header">📄 Hangi Evrağı Hazırlayalım?</div>
+        <div class="header">📄 Profesyonel Evrak Üretici</div>
         <div class="grid">
             <div class="card" onclick="openDoc('sene_basi_zumre', 'Sene Başı Zümre', 'teacher')"><div class="card-icon">📝</div><div class="card-title">Sene Başı Zümre</div></div>
             <div class="card" onclick="openDoc('sok_tutanagi', 'ŞÖK Tutanağı', 'teacher')"><div class="card-icon">📋</div><div class="card-title">ŞÖK Tutanağı</div></div>
@@ -42,65 +58,73 @@
             <div class="card" onclick="openDoc('bep_taslagi', 'BEP Taslağı', 'bep')"><div class="card-icon">🎯</div><div class="card-title">BEP Taslağı</div></div>
             <div class="card" onclick="openDoc('veli_izin_dilekcesi', 'Veli İzin Dilekçesi', 'izin')"><div class="card-icon">✉️</div><div class="card-title">Veli İzin Dilekçesi</div></div>
             <div class="card" onclick="openDoc('ders_kesim_raporu', 'Ders Kesim Raporu', 'rapor')"><div class="card-icon">✂️</div><div class="card-title">Ders Kesim Raporu</div></div>
-            <div class="card" onclick="openDoc('gunluk_plan', 'Günlük Plan', 'plan')"><div class="card-icon">🗓️</div><div class="card-title">Günlük/Yıllık Plan</div></div>
+            <div class="card" onclick="openDoc('gunluk_plan', 'Günlük/Yıllık Plan', 'plan')"><div class="card-icon">🗓️</div><div class="card-title">Günlük/Yıllık Plan</div></div>
             <div class="card" onclick="openDoc('baskanlik_secimi', 'Başkanlık Seçimi', 'student')"><div class="card-icon">🗳️</div><div class="card-title">Başkanlık Seçimi</div></div>
             <div class="card" onclick="openDoc('oturma_plani', 'Oturma Planı', 'student')"><div class="card-icon">🪑</div><div class="card-title">Oturma Planı</div></div>
         </div>
     </div>
 
     <div id="formView">
-        <button class="btn-back" onclick="goMenu()">🔙 Geri Dön</button>
+        <button class="btn-back" onclick="goMenu()">← Geri Dön</button>
         <div class="form-title" id="formHeader">Evrak Detayları</div>
 
         <form id="docForm">
             <input type="hidden" id="evrakTuru"><input type="hidden" id="evrakModu">
 
-            <!-- Ortak Alanlar -->
-            <div class="form-group active"><label>Okul Adı</label><input type="text" id="okulAdi" value="Atatürk Ortaokulu"></div>
-            <div class="form-group" id="grpMudur"><label>Okul Müdürü</label><input type="text" id="okulMuduru" value="Ahmet Yılmaz"></div>
-            <div class="form-group active"><label>Sınıf / Şube</label><input type="text" id="sinif" value="7/A"></div>
+            <!-- Genel Bilgiler -->
+            <div class="form-group active"><label>Eğitim - Öğretim Yılı</label><input type="text" id="egitimYili" value="2026-2027" required></div>
+            <div class="form-group active"><label>Okul Adı</label><input type="text" id="okulAdi" placeholder="Örn: Atatürk Ortaokulu" required></div>
+            <div class="form-group" id="grpMudur"><label>Okul Müdürü</label><input type="text" id="okulMuduru" placeholder="Örn: Ahmet Yılmaz"></div>
+            <div class="form-group active"><label>Sınıf / Şube</label><input type="text" id="sinif" placeholder="Örn: 7/A" required></div>
             
             <div class="form-group" id="grpBrans">
                 <label>Branş / Ders Adı</label>
                 <select id="brans">
                     <option value="matematik">Matematik</option>
-                    <option value="fen_bilimleri">Fen Bilimleri</option>
                     <option value="turkce">Türkçe</option>
+                    <option value="fen_bilimleri">Fen Bilimleri</option>
+                    <option value="sosyal_bilgiler">Sosyal Bilgiler</option>
+                    <option value="ingilizce">İngilizce</option>
+                    <option value="sinif_ogretmenligi">Sınıf Öğretmenliği</option>
+                    <option value="okul_oncesi">Okul Öncesi</option>
+                    <option value="beden_egitimi">Beden Eğitimi</option>
+                    <option value="din_kulturu">Din Kültürü ve Ahlak Bilgisi</option>
+                    <option value="rehberlik">Rehberlik ve Psikolojik Danışmanlık</option>
                 </select>
+            </div>
+
+            <!-- Kullanıcıyı Özgürleştiren Kimlik Alanı -->
+            <div class="form-group active">
+                <label id="lblSorumlu">Öğretmen Adı Soyadı</label>
+                <input type="text" id="sorumluKisi" placeholder="Kendi adınızı ve soyadınızı yazınız" required>
             </div>
 
             <div class="form-group active" id="grpTarih">
                 <label>Tarih ve Saat</label>
-                <div style="display:flex; gap:6px;">
+                <div style="display:flex; gap:8px;">
                     <input type="date" id="toplantiTarihi" required>
-                    <input type="time" id="toplantiSaati" value="15:30" id="saatInput">
+                    <input type="time" id="toplantiSaati" value="15:30">
                 </div>
             </div>
 
-            <!-- Tekil Öğrenci / Veli / Sevk Alanları -->
-            <div class="form-group" id="grpOgrenci"><label>Öğrenci Adı Soyadı</label><input type="text" id="ogrenciAdi"></div>
-            <div class="form-group" id="grpVeli"><label>Veli Adı Soyadı</label><input type="text" id="veliAdi"></div>
-            <div class="form-group" id="grpNeden"><label id="lblNeden">Açıklama / Sevk Nedeni</label><textarea id="aciklamaNedeni" rows="2"></textarea></div>
-            <div class="form-group" id="grpTani"><label>Öğrenci Tanısı</label><input type="text" id="tani" placeholder="Örn: Özgül Öğrenme Güçlüğü"></div>
+            <!-- Tekil Olay Alanları -->
+            <div class="form-group" id="grpOgrenci"><label>Öğrenci Adı Soyadı</label><input type="text" id="ogrenciAdi" placeholder="Örn: Ali Kaya"></div>
+            <div class="form-group" id="grpVeli"><label>Veli Adı Soyadı</label><input type="text" id="veliAdi" placeholder="Örn: Ayşe Kaya"></div>
+            <div class="form-group" id="grpNeden"><label id="lblNeden">Açıklama / Sevk Nedeni</label><textarea id="aciklamaNedeni" rows="3" placeholder="Gerekçeyi buraya detaylıca yazınız..."></textarea></div>
+            <div class="form-group" id="grpTani"><label>Öğrenci Tanısı / Özel Durumu</label><input type="text" id="tani" placeholder="Örn: Özgül Öğrenme Güçlüğü"></div>
             
-            <!-- Plan / Rapor Alanları -->
-            <div class="form-group" id="grpDonem"><label>Dönem</label><input type="text" id="donem" placeholder="Örn: 2026-2027 Eğitim Yılı 1. Dönem"></div>
-            <div class="form-group" id="grpKonu"><label>Konu</label><input type="text" id="konu" placeholder="Örn: Cebirsel İfadeler"></div>
-
-            <div class="form-group active">
-                <label id="lblSorumlu">Öğretmen Adı Soyadı</label>
-                <!-- İsmin Sabitlendi -->
-                <input type="text" value="Mevlüt Hoca" readonly style="background:#e2e8f0; font-weight:bold; color:#2c3e50;">
-            </div>
+            <!-- Plan/Rapor Alanları -->
+            <div class="form-group" id="grpDonem"><label>Dönem</label><input type="text" id="donem" placeholder="Örn: 1. Dönem"></div>
+            <div class="form-group" id="grpKonu"><label>İşlenen Konu</label><input type="text" id="konu" placeholder="Örn: Cebirsel İfadeler"></div>
 
             <!-- Dinamik Ekleme Alanı -->
             <div class="form-group" id="grpDinamik">
                 <label id="lblDinamik">Liste Ekle</label>
                 <div id="dynamicList"></div>
-                <button type="button" class="btn-add" id="btnAdd" onclick="addDynamicItem()">+ Ekle</button>
+                <button type="button" class="btn-add" id="btnAdd" onclick="addDynamicItem()">+ Yeni Satır Ekle</button>
             </div>
 
-            <button type="submit" class="btn-submit" id="btnSubmit">Evrağı Üret ve Bana Gönder</button>
+            <button type="submit" class="btn-submit" id="btnSubmit">Evrağı Üret ve İndir</button>
         </form>
         <div id="statusMessage"></div>
     </div>
@@ -112,7 +136,19 @@
 
     function showGroups(ids) {
         document.querySelectorAll('.form-group').forEach(el => el.classList.remove('active'));
-        ids.forEach(id => document.getElementById(id).classList.add('active'));
+        ids.push('grpTarih'); 
+        
+        document.querySelectorAll('.form-group').forEach(el => {
+           if(el.id === "" && el.querySelector('#egitimYili')) el.classList.add('active');
+           if(el.id === "" && el.querySelector('#okulAdi')) el.classList.add('active');
+           if(el.id === "" && el.querySelector('#sinif')) el.classList.add('active');
+           if(el.id === "" && el.querySelector('#sorumluKisi')) el.classList.add('active');
+        });
+
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.classList.add('active');
+        });
     }
 
     function openDoc(type, title, mode) {
@@ -121,34 +157,44 @@
         document.getElementById('formHeader').innerText = title;
         document.getElementById('dynamicList').innerHTML = "";
         
-        let activeFields = ['grpTarih']; // Herkeste tarih olsun
+        let activeFields = []; 
         const lblDinamik = document.getElementById('lblDinamik');
         const btnAdd = document.getElementById('btnAdd');
+        const lblSorumlu = document.getElementById('lblSorumlu');
 
         if (mode === 'teacher') {
             activeFields.push('grpBrans', 'grpMudur', 'grpDinamik');
-            lblDinamik.innerText = "Katılan Diğer Öğretmenler"; btnAdd.innerText = "+ Öğretmen Ekle";
+            lblDinamik.innerText = "Toplantıya Katılan Diğer Öğretmenler"; btnAdd.innerText = "+ Öğretmen Ekle";
+            lblSorumlu.innerText = "Zümre / Toplantı Başkanı";
         } else if (mode === 'student') {
             activeFields.push('grpMudur', 'grpDinamik');
-            lblDinamik.innerText = "Öğrenci Listesi"; btnAdd.innerText = "+ Öğrenci Ekle";
+            lblDinamik.innerText = "Öğrenci Listesi / Adaylar"; btnAdd.innerText = "+ Öğrenci Ekle";
+            lblSorumlu.innerText = "Sınıf Rehber Öğretmeni";
         } else if (mode === 'sevk') {
             activeFields.push('grpOgrenci', 'grpNeden');
-            document.getElementById('lblNeden').innerText = "Sevk / Görüşme Nedeni";
+            document.getElementById('lblNeden').innerText = "Rehberlik Servisine Sevk Nedeni";
+            lblSorumlu.innerText = "Sevk Eden Öğretmen";
         } else if (mode === 'izin') {
             activeFields.push('grpOgrenci', 'grpVeli', 'grpNeden', 'grpMudur');
-            document.getElementById('lblNeden').innerText = "İzin Nedeni";
+            document.getElementById('lblNeden').innerText = "İzin Talep Nedeni";
+            lblSorumlu.innerText = "İlgili Sınıf Öğretmeni";
         } else if (mode === 'bep') {
             activeFields.push('grpOgrenci', 'grpTani', 'grpDinamik');
-            lblDinamik.innerText = "BEP Hedefleri"; btnAdd.innerText = "+ Hedef Ekle";
+            lblDinamik.innerText = "Dönemlik BEP Hedefleri"; btnAdd.innerText = "+ Hedef Ekle";
+            lblSorumlu.innerText = "BEP Geliştirme Birimi / Öğretmen";
         } else if (mode === 'rapor' || mode === 'plan') {
             activeFields.push('grpBrans', 'grpDonem', 'grpKonu', 'grpDinamik', 'grpMudur');
-            lblDinamik.innerText = "İşlenen Konular / Kazanımlar"; btnAdd.innerText = "+ Madde Ekle";
+            lblDinamik.innerText = "İşlenen Konular / Kazanımlar"; btnAdd.innerText = "+ Kazanım/Madde Ekle";
+            lblSorumlu.innerText = "Ders Öğretmeni";
         }
         
         showGroups(activeFields);
         document.getElementById('menuView').style.display = 'none';
         document.getElementById('formView').style.display = 'block';
-        document.getElementById('statusMessage').innerText = "";
+        
+        const statusEl = document.getElementById('statusMessage');
+        statusEl.style.display = 'none';
+        statusEl.innerText = "";
     }
 
     function goMenu() {
@@ -157,9 +203,10 @@
     }
 
     function addDynamicItem() {
+        const mode = document.getElementById('evrakModu').value;
         const div = document.createElement('div');
         div.className = 'dynamic-item';
-        div.innerHTML = `<input type="text" class="dyn-val" placeholder="Buraya yazın..."><button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>`;
+        div.innerHTML = `<input type="text" class="dyn-val" placeholder="İçerik giriniz..."><button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>`;
         document.getElementById('dynamicList').appendChild(div);
     }
 
@@ -169,8 +216,10 @@
         const btn = document.getElementById('btnSubmit');
         
         btn.disabled = true;
-        status.style.color = "#2980b9";
-        status.innerText = "Evrak en ince detayına kadar hazırlanıyor...";
+        status.style.display = 'block';
+        status.style.backgroundColor = '#eff6ff';
+        status.style.color = "#2563eb";
+        status.innerText = "⏳ Resmi evrakınız oluşturuluyor, lütfen bekleyin...";
 
         const inputs = document.querySelectorAll('.dyn-val');
         const list = [];
@@ -180,6 +229,7 @@
             telegram_user_id: tg?.initDataUnsafe?.user?.id, 
             evrak_turu: document.getElementById('evrakTuru').value,
             evrak_modu: document.getElementById('evrakModu').value,
+            egitim_yili: document.getElementById('egitimYili')?.value,
             brans: document.getElementById('brans')?.value,
             okul_adi: document.getElementById('okulAdi')?.value,
             okul_muduru: document.getElementById('okulMuduru')?.value,
@@ -192,6 +242,7 @@
             konu: document.getElementById('konu')?.value,
             toplanti_tarihi: document.getElementById('toplantiTarihi')?.value,
             toplanti_saati: document.getElementById('toplantiSaati')?.value,
+            sorumlu_kisi: document.getElementById('sorumluKisi')?.value,
             dinamik_liste: list
         };
 
@@ -202,18 +253,21 @@
                 body: JSON.stringify(payload)
             });
 
+            const resData = await response.json();
             if (response.ok) {
-                status.style.color = "#27ae60";
-                status.innerText = "✅ Kusursuz! Evrak mesaj olarak gönderildi.";
-                setTimeout(() => { if (tg) tg.close(); }, 2500); 
+                status.style.backgroundColor = '#ecfdf5';
+                status.style.color = "#059669";
+                status.innerText = "✅ Evrak başarıyla onaylandı ve Telegram sohbetinize gönderildi!";
+                setTimeout(() => { if (tg) tg.close(); }, 3000); 
             } else {
-                const resData = await response.json();
-                status.style.color = "#e74c3c";
-                status.innerText = resData.message || "Hata oluştu.";
+                status.style.backgroundColor = '#fef2f2';
+                status.style.color = "#dc2626";
+                status.innerText = "⚠️ " + (resData.message || "İşlem sırasında bir hata oluştu.");
             }
         } catch (err) {
-            status.style.color = "#e74c3c";
-            status.innerText = "Sunucuya bağlanılamadı.";
+            status.style.backgroundColor = '#fef2f2';
+            status.style.color = "#dc2626";
+            status.innerText = "⚠️ Sunucuya ulaşılamıyor. Lütfen internet bağlantınızı kontrol ediniz.";
         } finally {
             btn.disabled = false;
         }
